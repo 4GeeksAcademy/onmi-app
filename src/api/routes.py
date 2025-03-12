@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Notes
+from api.models import db, User, Notes, Habits
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from sqlalchemy.exc import NoResultFound
@@ -201,3 +201,146 @@ def call_notes():
     return jsonify({"resul": list_notes}), 200
 
 
+# @app.route("/protected", methods=["GET"])
+# @jwt_required()
+# def protected():
+#     # Access the identity of the current user with get_jwt_identity
+#     current_user = get_jwt_identity()
+#     return jsonify(logged_in_as=current_user), 200
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@api.route("/habits", methods=["POST"])
+def create_habit():
+    try:
+        request_body = request.get_json()
+
+        # Validar que todos los campos necesarios estén en la solicitud
+        if not all(key in request_body for key in ["name", "description", "category", "user_id", "goals_id", "ready"]):
+            return jsonify({"error": "Todos los campos son obligatorios"}), 400
+
+        # Crear nueva instancia de Habit
+        new_habit = Habits(
+            name=request_body["name"],
+            description=request_body["description"],
+            category=request_body["category"],
+            user_id=request_body["user_id"],
+            goals_id=request_body["goals_id"],
+            ready=request_body["ready"]
+        )
+
+        # Guardar en la base de datos
+        db.session.add(new_habit)
+        db.session.commit()
+
+        return jsonify({
+            "msg": "Hábito creado exitosamente",
+            "habit": {
+                "id": new_habit.id,
+                "name": new_habit.name,
+                "description": new_habit.description,
+                "category": new_habit.category,
+                "user_id": new_habit.user_id,
+                "goals_id": new_habit.goals_id,
+                "ready": new_habit.ready
+            }
+        }), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route('/habits', methods=['GET'])
+def handle_get_habits():
+    # Obtener todos los hábitos desde la base de datos
+    habits = Habits.query.all() 
+    
+    if not habits:
+        return jsonify({"msg": "No habits found"}), 404  # Si no hay hábitos, devuelve 404
+    
+    # Serializar cada objeto Habit usando el método serialize()
+    list_habits = [habit.serialize() for habit in habits]
+    
+    return jsonify(list_habits), 200  # Devolver la lista de hábitos serializados
+
+
+@api.route('/habits/<int:id>', methods=['DELETE'])
+def delete_habit(id):
+    #print(id)
+    try:
+        habit_query = db.session.execute(db.select(Habits).filter_by(id=id)).scalar_one()
+        #print(user_query.serialize())
+        db.session.delete(habit_query)
+        db.session.commit()
+        return jsonify({"msg":"habit  delete"}), 200
+    except:
+        return jsonify({"msg":"habit not exist"}), 404

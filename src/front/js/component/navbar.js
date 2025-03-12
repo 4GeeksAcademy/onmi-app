@@ -38,7 +38,7 @@ export const Navbar = () => {
 							Notes
 						</Link> : null}
 					</li>
-					<li className="nav-item ms-5 me-5 ">
+					<li className="nav-item ms-5 me-5">
 						{store.auth ? <Link className="nav-link" to="/habits">
 							Habit-Tracker
 						</Link> : null}
