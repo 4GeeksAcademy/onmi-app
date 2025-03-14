@@ -278,22 +278,33 @@ def call_notes():
 
 
 
-
+# Funcional
 @api.route("/habits", methods=["POST"])
+@jwt_required()  # Protegemos el endpoint con JWT
 def create_habit():
+    """Crea un nuevo hábito solo si el usuario está autenticado"""
+
     try:
         request_body = request.get_json()
 
-        # Validar que todos los campos necesarios estén en la solicitud
-        if not all(key in request_body for key in ["name", "description", "category", "user_id", "goals_id", "ready"]):
+        # Obtener el usuario autenticado desde el token
+        current_user_email = get_jwt_identity()
+        user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
+
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        # Validar que todos los campos obligatorios estén en la solicitud
+        required_fields = ["name", "description", "category", "goals_id", "ready"]
+        if not all(field in request_body for field in required_fields):
             return jsonify({"error": "Todos los campos son obligatorios"}), 400
 
-        # Crear nueva instancia de Habit
+        # Crear nueva instancia de Habit asignando automáticamente el user_id
         new_habit = Habits(
             name=request_body["name"],
             description=request_body["description"],
             category=request_body["category"],
-            user_id=request_body["user_id"],
+            user_id=user.id,  # 🔥 Se asigna automáticamente con el usuario autenticado
             goals_id=request_body["goals_id"],
             ready=request_body["ready"]
         )
@@ -304,43 +315,70 @@ def create_habit():
 
         return jsonify({
             "msg": "Hábito creado exitosamente",
-            "habit": {
-                "id": new_habit.id,
-                "name": new_habit.name,
-                "description": new_habit.description,
-                "category": new_habit.category,
-                "user_id": new_habit.user_id,
-                "goals_id": new_habit.goals_id,
-                "ready": new_habit.ready
-            }
+            "habit": new_habit.serialize()  # Asegúrate de que `Habits` tiene un método `serialize()`
         }), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
+
+
+# Funcional
 @api.route('/habits', methods=['GET'])
+@jwt_required()
 def handle_get_habits():
-    # Obtener todos los hábitos desde la base de datos
-    habits = Habits.query.all() 
-    
+    """Ruta protegida que devuelve los hábitos del usuario autenticado"""
+
+    current_user = get_jwt_identity()  # Obtiene el email o ID del usuario autenticado
+
+    # Buscar el usuario en la base de datos
+    user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one_or_none()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    # Filtrar los hábitos del usuario autenticado
+    habits = db.session.execute(
+        db.select(Habits).filter_by(user_id=user.id)
+    ).scalars().all()  # Convertir a lista para evitar problemas con generadores
+
     if not habits:
-        return jsonify({"msg": "No habits found"}), 404  # Si no hay hábitos, devuelve 404
-    
-    # Serializar cada objeto Habit usando el método serialize()
+        return jsonify({"msg": "No habits found"}), 404
+
+    # Serializar los hábitos
     list_habits = [habit.serialize() for habit in habits]
-    
-    return jsonify(list_habits), 200  # Devolver la lista de hábitos serializados
+
+    return jsonify(list_habits), 200  # Devuelve solo los hábitos del usuario autenticado
+
 
 
 @api.route('/habits/<int:id>', methods=['DELETE'])
+@jwt_required()  # 🔒 
 def delete_habit(id):
-    #print(id)
+    
+
     try:
-        habit_query = db.session.execute(db.select(Habits).filter_by(id=id)).scalar_one()
-        #print(user_query.serialize())
-        db.session.delete(habit_query)
+        current_user_email = get_jwt_identity()
+        user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # busca e habito en la base de dats.
+        habit = db.session.execute(db.select(Habits).filter_by(id=id)).scalar_one_or_none()
+
+        if not habit:
+            return jsonify({"error": "Habit not found"}), 404
+
+        if habit.user_id != user.id:
+            return jsonify({"error": "You do not have permission to delete this habit"}), 403
+
+        # Elimina el hbit,
+        db.session.delete(habit)
         db.session.commit()
-        return jsonify({"msg":"habit  delete"}), 200
-    except:
-        return jsonify({"msg":"habit not exist"}), 404
+
+        return jsonify({"msg": "Habit successfully deleted"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
