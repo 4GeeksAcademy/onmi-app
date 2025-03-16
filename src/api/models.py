@@ -1,8 +1,21 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import Integer, Enum, String, ForeignKey, Boolean
+from enum import Enum as PyEnum
 
 db = SQLAlchemy()
+
+class Gender(PyEnum):
+    MALE = "Male"
+    FEMALE = "Female"
+    NON_BINARY = "Non-binary"
+    OTHER = "Other"
+    PREFER_NOT_TO_SAY = "Prefer not to say"
+
+class Role(PyEnum):
+    ADMIN = "Admin"
+    MODERATOR = "Moderator"
+    USER = "User"
 
 class User(db.Model):
     __tablename__ = "user"
@@ -11,8 +24,9 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(500))
-    is_active: Mapped[bool]
-    # role: Mapped[int] = mapped_column(Integer, nullable=False)
+    gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    role: Mapped[Role] = mapped_column(Enum(Role), nullable=False, default=Role.USER)
     notes: Mapped["Notes"] = relationship(back_populates="user")
     habits: Mapped["Habits"] = relationship(back_populates="user")
     goals: Mapped["Goals"] = relationship(back_populates="user")
@@ -24,8 +38,9 @@ class User(db.Model):
             "id": self.id,
             "name": self.name,
             "email": self.email,
+            "gender": self.gender.value,
             "is_active": self.is_active,
-            # "role": self.role
+            "role": self.role.value
         }
 
 class Notes(db.Model):

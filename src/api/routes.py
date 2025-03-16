@@ -78,8 +78,7 @@ def create_user():
             email=request_body["email"],
             password=hashed_password,
             is_active=True,
-            # role=3
-            
+            role= "USER"
         )
 
         db.session.add(new_user)
@@ -201,9 +200,3 @@ def call_notes():
     return jsonify({"resul": list_notes}), 200
 
 
-# @app.route("/protected", methods=["GET"])
-# @jwt_required()
-# def protected():
-#     # Access the identity of the current user with get_jwt_identity
-#     current_user = get_jwt_identity()
-#     return jsonify(logged_in_as=current_user), 200
