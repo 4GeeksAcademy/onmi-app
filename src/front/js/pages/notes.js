@@ -43,7 +43,7 @@ export const Notes = () => {
                 <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal2">New note</button>
             </div>
 
-            <div className="modal" id="modal2" tabindex="-1" aria-labelledby="modal2Label" aria-hidden="true">
+            <div className="modal" id="modal2" tabIndex="-1" aria-labelledby="modal2Label" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -58,15 +58,15 @@ export const Notes = () => {
                         <div className="modal-footer">
 
                             {/* lista de categorias */}
-                            <div class="dropdown-center">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div className="dropdown-center">
+                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Label
                                 </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Health</a></li>
-                                    <li><a class="dropdown-item" href="#">Sport</a></li>
-                                    <li><a class="dropdown-item" href="#">Education</a></li>
-                                    <li><a class="dropdown-item" href="#">Finance</a></li>
+                                <ul className="dropdown-menu">
+                                    <li><a className="dropdown-item" href="#">Health</a></li>
+                                    <li><a className="dropdown-item" href="#">Sport</a></li>
+                                    <li><a className="dropdown-item" href="#">Education</a></li>
+                                    <li><a className="dropdown-item" href="#">Finance</a></li>
                                 </ul>
                             </div>
 

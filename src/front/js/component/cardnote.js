@@ -25,21 +25,21 @@ export const Cardnote = (props) => {
                             <button type="button" className="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                 <i className="fa-solid fa-ellipsis-vertical"></i>
                             </button>
-                            <div className="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div className="modal" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div className="modal-dialog modal-dialog-centered">
                                     <div className="modal-content">
                                         <div className="modal-header">
                                             <div className="" id="exampleModalLabel">
                                                 {/* lista de categorias */}
-                                                <div class="dropdown-center">
-                                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <div className="dropdown-center">
+                                                    <button className="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                         Label
                                                     </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#">Health</a></li>
-                                                        <li><a class="dropdown-item" href="#">Sport</a></li>
-                                                        <li><a class="dropdown-item" href="#">Education</a></li>
-                                                        <li><a class="dropdown-item" href="#">Finance</a></li>
+                                                    <ul className="dropdown-menu">
+                                                        <li><a className="dropdown-item" href="#">Health</a></li>
+                                                        <li><a className="dropdown-item" href="#">Sport</a></li>
+                                                        <li><a className="dropdown-item" href="#">Education</a></li>
+                                                        <li><a className="dropdown-item" href="#">Finance</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
