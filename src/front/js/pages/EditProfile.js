@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/editprofile.css";
+import { DeletAccount } from "../component/ModalDeletAccount";
 
 export const EditProfile = () => {
     const [name, setName] = useState("Matt");
@@ -55,7 +56,7 @@ export const EditProfile = () => {
                     </label>
                     <button type="submit">Save</button>
                 </form>
-                <button className="delete-account-button">Delete account</button>
+                <div><DeletAccount/></div>
             </main>
             <div className="avatar-section">
                 <div className="avatar-container">
