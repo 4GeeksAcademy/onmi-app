@@ -1,14 +1,29 @@
 """empty message
 
+<<<<<<< HEAD:migrations/versions/ec9225e89728_.py
 <<<<<<<< HEAD:migrations/versions/ec9225e89728_.py
 Revision ID: ec9225e89728
 Revises: 
+=======
+<<<<<<< HEAD:migrations/versions/9ea39839a29b_.py
+Revision ID: 9ea39839a29b
+Revises: 
+Create Date: 2025-03-16 15:09:02.935381
+=======
+<<<<<<<< HEAD:migrations/versions/ec9225e89728_.py
+Revision ID: ec9225e89728
+Revises: 
+>>>>>>> a144116 (edicion de routes habits):migrations/versions/9ea39839a29b_.py
 Create Date: 2025-03-15 12:37:58.090944
 ========
 Revision ID: 2e0dc5ab71ec
 Revises: 
 Create Date: 2025-03-16 13:54:50.429123
 >>>>>>>> bc1f837 (base de datos role y gender):migrations/versions/2e0dc5ab71ec_.py
+<<<<<<< HEAD:migrations/versions/ec9225e89728_.py
+=======
+>>>>>>> e0e479b (base de datos role y gender):migrations/versions/ec9225e89728_.py
+>>>>>>> a144116 (edicion de routes habits):migrations/versions/9ea39839a29b_.py
 
 """
 from alembic import op
@@ -16,11 +31,21 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
+<<<<<<< HEAD:migrations/versions/ec9225e89728_.py
+=======
+<<<<<<< HEAD:migrations/versions/9ea39839a29b_.py
+revision = '9ea39839a29b'
+=======
+>>>>>>> a144116 (edicion de routes habits):migrations/versions/9ea39839a29b_.py
 <<<<<<<< HEAD:migrations/versions/ec9225e89728_.py
 revision = 'ec9225e89728'
 ========
 revision = '2e0dc5ab71ec'
 >>>>>>>> bc1f837 (base de datos role y gender):migrations/versions/2e0dc5ab71ec_.py
+<<<<<<< HEAD:migrations/versions/ec9225e89728_.py
+=======
+>>>>>>> e0e479b (base de datos role y gender):migrations/versions/ec9225e89728_.py
+>>>>>>> a144116 (edicion de routes habits):migrations/versions/9ea39839a29b_.py
 down_revision = None
 branch_labels = None
 depends_on = None
