@@ -16,7 +16,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					initial: "white"
 				}
 			],
-			notes:[],
+			notes: [],
 			//estado julia 
 
 			//maldit pomodoro estado:
@@ -67,14 +67,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 						return false
 					}
 					localStorage.setItem("token", result.access_token)
-					setStore({auth:true})
-					
+					setStore({ auth: true })
+
 					return true
 				} catch (error) {
 					console.error(error);
 				};
 			},
 
+
+			
 			register: async (name, email, password) => {
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
@@ -148,7 +150,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const response = await fetch(process.env.BACKEND_URL + "/api/notes", requestOptions);
 					const result = await response.json();
 					console.log(response);
-					
+
 					console.log(result)
 					//setStore({ message: data.message })
 				} catch (error) {
@@ -157,6 +159,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			},
 
+			
 
 
 
@@ -266,6 +269,83 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 
+			PostHabits: async (name, description, category,ready,user_id,golds_id ) => {
+
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				
+				const raw = JSON.stringify({
+				  "name": name,
+				  "description": description,
+				  "category": category,
+				  "user_id" : user_id,
+				  "golds_id": golds_id,
+				  "ready": ready
+				});
+				
+				const requestOptions = {
+				  method: "POST",
+				  headers: myHeaders,
+				  body: raw,
+				  redirect: "follow"
+				};
+				
+				try {
+				  const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+				  const result = await response.json();
+				  console.log(result)
+				} catch (error) {
+				  console.error(error);
+				};
+
+
+
+
+
+
+			},
+
+			getHabits: async () => {
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+			
+				const requestOptions = {
+					method: "GET",
+					headers: myHeaders,
+					redirect: "follow" 
+				};
+			
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+					if (!response.ok) {
+						throw new Error(`HTTP error! status: ${response.status}`);
+					}
+					const result = await response.json();
+					console.log(result);
+				} catch (error) {
+					console.error("Error fetching habits:", error); // Manejo de errores si falla la solicitud
+				}
+			},
+
+			DeleteHabits: async () => {
+				const myHeaders = new Headers();
+				const raw = "";
+
+				const requestOptions = {
+				method: "DELETE",
+				headers: myHeaders,
+				body: raw,
+				redirect: "follow"
+				};
+
+				try {
+				const response = await fetch(process.env.BACKEND_URL + "/api/habits/<int:id>", requestOptions);
+				const result = await response.json();
+				console.log(result)
+				} catch (error) {
+				console.error(error);
+				};
+			},	
 
 
 
@@ -421,7 +501,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			},
 		}
-	};
+	
+	}
 };
 
 export default getState;

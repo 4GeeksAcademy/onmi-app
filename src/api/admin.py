@@ -9,12 +9,12 @@ class NotesView(ModelView):
     form_columns = ('title', 'description','category', 'user_id', 'projects_id')
 
 class HabitsView(ModelView):
-    column_list = ('name', 'description', 'category', 'user_id', 'goals_id')
-    form_columns = ('name', 'description', 'category', 'user_id', 'goals_id')
+    column_list = ('name', 'description','category', 'user_id', 'goals_id', 'ready')
+    form_columns = ('name', 'description','category', 'user_id', 'goals_id','ready')
 
 class GoalsView(ModelView):
-    column_list = ('target', 'description', 'user_id', 'projects_id')
-    form_columns = ('target', 'description', 'user_id', 'projects_id')
+    column_list = ('target', 'description' ,'user_id', 'projects_id', 'ready')
+    form_columns = ('target', 'description','user_id', 'projects_id', 'ready')
 
 class ProjectsView(ModelView):
     column_list = ('name', 'description', 'category', 'user_id')
