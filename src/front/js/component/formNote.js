@@ -3,51 +3,51 @@ import React, { useState, useEffect } from "react";
 
 
 export const FormNote = () => {
-  const [note, setContact] = useState({})
+  //const [note, setContact] = useState({})
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   
   //console.log((note));
   
 
-  async function createNote() {
-    // if (name === "" || email === "" || phone === "" || address === "") {
-    //   throw new Error("Contacto no creado. Complete todos los campos de manera correcta");
-    // } else {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+  // async function createNote() {
+  //   // if (name === "" || email === "" || phone === "" || address === "") {
+  //   //   throw new Error("Contacto no creado. Complete todos los campos de manera correcta");
+  //   // } else {
+  //     const myHeaders = new Headers();
+  //     myHeaders.append("Content-Type", "application/json");
 
-      const raw = JSON.stringify({
-        "title": title,
-        "description": description
-      });
+  //     const raw = JSON.stringify({
+  //       "title": title,
+  //       "description": description
+  //     });
 
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow"
-      };
+  //     const requestOptions = {
+  //       method: "POST",
+  //       headers: myHeaders,
+  //       body: raw,
+  //       redirect: "follow"
+  //     };
 
-      try {
-        let response = await fetch(process.env.BACKEND_URL+"/api/note", requestOptions);
-        if (response === !201) {
-          alert("Ups! This note was not create")
-        }
-        let result = await response.json();
-        setContact=(result)
-        setTitle("")
-        setDescription("")
-      } catch (error) {
-        console.error(error);
-      };
-    // }
-  }
+  //     try {
+  //       let response = await fetch(process.env.BACKEND_URL+"/api/note", requestOptions);
+  //       if (response === !201) {
+  //         alert("Ups! This note was not create")
+  //       }
+  //       let result = await response.json();
+  //       setContact=(result)
+  //       setTitle("")
+  //       setDescription("")
+  //     } catch (error) {
+  //       console.error(error);
+  //     };
+  //   // }
+  // }
 
  
-  useEffect(() => {
-    createNote()
-  }, [])
+  // useEffect(() => {
+  //   createNote()
+  // }, [])
 
   return (
     <div className="container">
