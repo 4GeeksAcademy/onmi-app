@@ -4,7 +4,8 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 import LandingPage from "./pages/landingpage";
 
-import { EditProfile } from "./pages/EditProfile"; // Asegúrate de que el nombre sea correcto
+import { EditProfile } from "./pages/EditProfile";
+// import { Habits } from "./pages/habits";
 import { Loginview } from "./pages/loginview";
 import { ForgotPassword } from "./pages/resetpassword";
 import { Home } from "./pages/home";
