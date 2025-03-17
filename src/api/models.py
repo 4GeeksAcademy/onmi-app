@@ -24,7 +24,7 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(500))
-    gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
+    gender: Mapped[Gender] = mapped_column(String(Gender), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     role: Mapped[Role] = mapped_column(Enum(Role), nullable=False, default=Role.USER)
     notes: Mapped["Notes"] = relationship(back_populates="user")

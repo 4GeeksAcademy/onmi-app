@@ -42,7 +42,7 @@ export const Register = () => {
       return;
     }
 
-    const userCreated = await actions.register(formData.name, formData.email, formData.password, formData.gender);
+    const userCreated = await actions.register(formData.name, formData.email, formData.gender, formData.password );
 
     if (!userCreated) {
       Swal.fire({
