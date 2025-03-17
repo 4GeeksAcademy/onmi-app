@@ -1,14 +1,8 @@
 """empty message
 
-<<<<<<<< HEAD:migrations/versions/d03fa6393704_.py
-Revision ID: d03fa6393704
+Revision ID: 2a96618062e2
 Revises: 
-Create Date: 2025-03-16 10:27:12.767853
-========
-Revision ID: 7d0c9cb7304f
-Revises: 
-Create Date: 2025-03-17 10:02:39.526471
->>>>>>>> 5e9dac7e47d99f7e739082a5a91a29b879292a1e:migrations/versions/7d0c9cb7304f_.py
+Create Date: 2025-03-17 10:49:32.956218
 
 """
 from alembic import op
@@ -16,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:migrations/versions/d03fa6393704_.py
-revision = 'd03fa6393704'
-========
-revision = '7d0c9cb7304f'
->>>>>>>> 5e9dac7e47d99f7e739082a5a91a29b879292a1e:migrations/versions/7d0c9cb7304f_.py
+revision = '2a96618062e2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,12 +23,9 @@ def upgrade():
     sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password', sa.String(length=500), nullable=False),
-    sa.Column('gender', sa.Enum('MALE', 'FEMALE', 'NON_BINARY', 'OTHER', 'PREFER_NOT_TO_SAY', name='gender'), nullable=False),
+    sa.Column('gender', sa.String(length=<enum 'Gender'>), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
-<<<<<<<< HEAD:migrations/versions/d03fa6393704_.py
-========
     sa.Column('role', sa.Enum('ADMIN', 'MODERATOR', 'USER', name='role'), nullable=False),
->>>>>>>> 5e9dac7e47d99f7e739082a5a91a29b879292a1e:migrations/versions/7d0c9cb7304f_.py
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
