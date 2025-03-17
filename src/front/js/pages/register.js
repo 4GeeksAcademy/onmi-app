@@ -1,7 +1,6 @@
 import React, { useState, useContext} from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Context } from "../store/appContext";
-import "../../styles/home.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2'
 
@@ -26,6 +25,7 @@ export const Register = () => {
       [name]: value
     }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Add signup logic here
@@ -33,7 +33,6 @@ export const Register = () => {
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        
         text: "Passwords are not matching",
         customClass: {
           title: "swal-custom-title",
@@ -43,111 +42,122 @@ export const Register = () => {
       return;
     }
 
-    const userCreated = await actions.register(formData.name, formData.email, formData.password);
+    const userCreated = await actions.register(formData.name, formData.email, formData.gender, formData.password );
 
-      if (!userCreated) {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Cannot create user!",
-          footer: '<a href="#">Double check the inputs please...</a>',
-          customClass: {
-            title: "swal-custom-title",
-            confirmButton: "swal-custom-confirm-button",
-          },
-  
-        });
-      }else{
-        Swal.fire({
-          title: "User created!",
-          text: "Welcome to ONMi!",
-          icon: "success",
-          customClass: {
-            title: "swal-custom-title",
-            confirmButton: "swal-custom-confirm-button",
-          },
-  
-        });
-        navigate("/profile");
-      }
-    };
+    if (!userCreated) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Cannot create user!",
+        footer: '<a href="#">Double check the inputs please...</a>',
+        customClass: {
+          title: "swal-custom-title",
+          confirmButton: "swal-custom-confirm-button",
+        },
+      });
+    } else {
+      Swal.fire({
+        title: "User created!",
+        text: "Welcome to ONMi!",
+        icon: "success",
+        customClass: {
+          title: "swal-custom-title",
+          confirmButton: "swal-custom-confirm-button",
+        },
+      });
+      navigate("/profile");
+    }
+  };
 
-    console.log('Signup data:', formData);
-  
+  console.log('Signup data:', formData);
+
   return (
     <div className="mx-auto my-5">
-    <div className="container">
-      {/* Left Side - Description */}
-      <div className="">
-        <h1 className="">Become a member</h1>
-        <p className="">
-          Onmino helps you organize your ideas, tasks, and projects simply and efficiently. Start today!
-        </p>
-      </div>
-      {/* Right Side - Signup Form */}
-      <div className="w-1/2 p-8 bg-white">
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
-              required
-            />
-          </div>
-          <div className="mb-4 relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
-              required
-            />
+      <div className="container">
+        {/* Left Side - Description */}
+        <div className="">
+          <h1 className="">Become a member</h1>
+          <p className="">
+            Onmino helps you organize your ideas, tasks, and projects simply and efficiently. Start today!
+          </p>
+        </div>
+        {/* Right Side - Signup Form */}
+        <div className="w-1/2 p-8 bg-white">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
+                required
+              />
+            </div>
+            <div className="mb-4 relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="btn mx-2"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            <div className="mb-4 relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
+                required
+              >
+                <option value="" disabled>Select Gender</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+              </select>
+            </div>
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="btn mx-2"
+              type="submit"
+              className="btn btn-primary"
             >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              Register
             </button>
-          </div>
-          <div className="mb-4 relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-[#D0D7DE] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F6FEB]"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="btn btn-primary"
-          >
-            Register
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
-

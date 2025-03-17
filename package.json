@@ -73,6 +73,7 @@
 		]
 	},
 	"dependencies": {
+		"bootstrap": "^5.3.3",
 		"lucide-react": "^0.477.0",
 		"prop-types": "^15.6.1",
 		"react": "^19.0.0",
@@ -80,6 +81,6 @@
 		"react-dom": "^19.0.0",
 		"react-polyfills": "0.0.1",
 		"react-router-dom": "^6.3.0",
-		"sweetalert2": "^11.6.13"
+		"sweetalert2": "^11.17.2"
 	}
 }

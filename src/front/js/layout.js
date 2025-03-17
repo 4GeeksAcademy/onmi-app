@@ -4,7 +4,8 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 import LandingPage from "./pages/landingpage";
 
-import { EditProfile } from "./pages/EditProfile"; // Asegúrate de que el nombre sea correcto
+import { EditProfile } from "./pages/EditProfile";
+// import { Habits } from "./pages/habits";
 import { Loginview } from "./pages/loginview";
 import { ForgotPassword } from "./pages/resetpassword";
 import { Home } from "./pages/home";
@@ -17,6 +18,7 @@ import { Register } from "./pages/register";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import { Pomodoro } from "./component/pomodoro";
+import HabitTracker from "./pages/habit-tracker";
 //create your first component
 const Layout = () => {
     //the basename is used when your project is published in a subdirectory and not in the root of the domain
@@ -40,7 +42,8 @@ const Layout = () => {
                         <Route element={<LandingPage />} path="/" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<EditProfile />} path="/editprofile" />
-                        <Route element={<Pomodoro />} path="/pomodoro" />  
+                        <Route element={<Pomodoro />} path="/pomodoro" />
+                        <Route element={<HabitTracker />} path="/habits" />  
                     </Routes>
                     <Footer />
                 </ScrollToTop>
