@@ -22,14 +22,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 			//maldit pomodoro estado:
 			pomodoroTime: 1500, // 25 min en segundos
 			started: false,
-			completedCycles: Number (localStorage.getItem("cycles")) || 0,
+			completedCycles: Number(localStorage.getItem("cycles")) || 0,
 
-//estado compañero
-
-
+			//estado compañero
 
 
-			
+
+
+
 		},
 		actions: {
 
@@ -76,7 +76,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 
-			
+
 			register: async (name, email, password) => {
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
@@ -159,7 +159,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			},
 
-			
+
 
 
 
@@ -196,15 +196,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 			addCompletedCycle: () => {
 				const store = getStore();
 				const newCycle = store.completedCycles + 1;
-				setStore({completedCycles: newCycle});
+				setStore({ completedCycles: newCycle });
 				localStorage.setItem("cycles", newCycle);
 				console.log("Nuevo ciclo guardado:", newCycle);
 
 			},
 
 			//pom: reinicia estadística
-			resetCycleCount: () =>{
-				setStore({ completedCycles: 0});
+			resetCycleCount: () => {
+				setStore({ completedCycles: 0 });
 				localStorage.setItem("cycles", 0);
 			},
 
@@ -269,33 +269,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 
-			PostHabits: async (name, description, category,ready,user_id,golds_id ) => {
+			PostHabits: async (name, description, category, ready, user_id, golds_id) => {
 
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
-				
+
 				const raw = JSON.stringify({
-				  "name": name,
-				  "description": description,
-				  "category": category,
-				  "user_id" : user_id,
-				  "golds_id": golds_id,
-				  "ready": ready
+					"name": name,
+					"description": description,
+					"category": category,
+					"user_id": user_id,
+					"golds_id": golds_id,
+					"ready": ready
 				});
-				
+
 				const requestOptions = {
-				  method: "POST",
-				  headers: myHeaders,
-				  body: raw,
-				  redirect: "follow"
+					method: "POST",
+					headers: myHeaders,
+					body: raw,
+					redirect: "follow"
 				};
-				
+
 				try {
-				  const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
-				  const result = await response.json();
-				  console.log(result)
+					const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+					const result = await response.json();
+					console.log(result)
 				} catch (error) {
-				  console.error(error);
+					console.error(error);
 				};
 
 
@@ -308,13 +308,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 			getHabits: async () => {
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
-			
+
 				const requestOptions = {
 					method: "GET",
 					headers: myHeaders,
-					redirect: "follow" 
+					redirect: "follow"
 				};
-			
+
 				try {
 					const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
 					if (!response.ok) {
@@ -332,23 +332,50 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const raw = "";
 
 				const requestOptions = {
-				method: "DELETE",
-				headers: myHeaders,
-				body: raw,
-				redirect: "follow"
+					method: "DELETE",
+					headers: myHeaders,
+					body: raw,
+					redirect: "follow"
 				};
 
 				try {
-				const response = await fetch(process.env.BACKEND_URL + "/api/habits/<int:id>", requestOptions);
-				const result = await response.json();
-				console.log(result)
+					const response = await fetch(process.env.BACKEND_URL + `/api/habits/<int:id>`, requestOptions);
+					const result = await response.json();
+					console.log(result)
 				} catch (error) {
-				console.error(error);
+					console.error(error);
 				};
-			},	
+			},
 
-
-
+			AccountDelete: async () => {
+				let token = localStorage.getItem("token");
+			
+				const myHeaders = new Headers();
+				myHeaders.append("Authorization", `Bearer ${token}`);
+			
+				const requestOptions = {
+					method: "DELETE",
+					headers: myHeaders,
+					redirect: "follow"
+				};
+			
+				try {
+					const response = await fetch(process.env.BACKEND_URL + `/api/user/`, requestOptions);
+			
+					if (response.ok) {
+						// Eliminar el token del localStorage
+						localStorage.removeItem("token");
+			
+						// Redirigir al landing page
+						window.location.href = "/"; 
+					} else {
+						console.error("Error al eliminar la cuenta");
+					}
+				} catch (error) {
+					console.error("Error en la solicitud:", error);
+				}
+			},
+			
 
 
 
@@ -492,16 +519,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const response = await fetch(process.env.BACKEND_URL + "/api/profile", requestOptions);
 					const result = await response.json();
 					console.log(response);
-					
+
 					console.log(result)
-				setStore({ user: result })
+					setStore({ user: result })
 				} catch (error) {
 					console.error(error);
 				};
 
 			},
 		}
-	
+
 	}
 };
 

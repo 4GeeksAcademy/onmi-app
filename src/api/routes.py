@@ -382,3 +382,39 @@ def delete_habit(id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@api.route('/user', methods=['DELETE'])
+@jwt_required()  # 🔒 Protege la ruta con JWT
+def delete_user():
+    try:
+        # Obtener la identidad del usuario autenticado
+        current_user_email = get_jwt_identity()
+
+
+        # Buscar el usuario autenticado en la base de datos
+        user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
+
+        if not user:
+            return jsonify({"error": "Authenticated user not found"}), 404
+
+        # Buscar el usuario que se desea eliminar
+        user_to_delete = db.session.execute(
+            db.select(User).filter_by(id=user.id)
+        ).scalar_one_or_none()
+
+        if not user_to_delete:
+            return jsonify({"error": "User not found"}), 404
+
+        # Verificar si el usuario autenticado puede eliminar la cuenta
+        if user.id != user_to_delete.id:
+            return jsonify({"error": "You do not have permission to delete this user"}), 403
+
+        # Eliminar el usuario
+        db.session.delete(user_to_delete)
+        db.session.commit()
+
+        return jsonify({"msg": "User successfully deleted"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

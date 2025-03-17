@@ -1,6 +1,9 @@
-import React from "react";
-
+import React, { useContext } from 'react';
+import { Context } from "../store/appContext"; 
 export const DeletAccount = () => {
+    const { store, actions } = useContext(Context);
+    
+
     return (
 
         <div>
@@ -23,7 +26,7 @@ export const DeletAccount = () => {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" className="btn btn-danger">Delete</button>
+                            <button type="button"  onClick={()=>actions.AccountDelete()} className="btn btn-danger">Delete</button>
                         </div>
                     </div>
                 </div>
