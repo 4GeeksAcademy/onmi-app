@@ -78,6 +78,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			
 			register: async (name, email, gender, password) => {
+				console.log(name, email, gender, password);
+				
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
 
