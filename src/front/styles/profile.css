@@ -1,6 +1,7 @@
 .parent{
     display: inline-flex;
     align-items: center;
+    justify-content: space-between;
 }
     
 
@@ -72,6 +73,17 @@ button{
     color:#ffffff;
     padding: 2% 1% 2% 1%;
     
+}
+
+img.female{
+    width: 300px;
+    height: 300px;
+    
+}
+
+div#middle.container{
+    margin-left: 30px;
+    margin-right: 30px;
 }
 
 

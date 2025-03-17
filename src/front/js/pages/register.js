@@ -13,7 +13,8 @@ export const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    gender: '',
   });
   
   const navigate = useNavigate();

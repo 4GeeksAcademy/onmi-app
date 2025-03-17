@@ -12,7 +12,8 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(500))
     is_active: Mapped[bool]
-    role: Mapped[int] = mapped_column(Integer, nullable=False)
+    # role: Mapped[int] = mapped_column(Integer, nullable=False)
+    gender: Mapped[str] = mapped_column(String(10), nullable=False)
     notes: Mapped["Notes"] = relationship(back_populates="user")
     habits: Mapped["Habits"] = relationship(back_populates="user")
     goals: Mapped["Goals"] = relationship(back_populates="user")
@@ -25,7 +26,8 @@ class User(db.Model):
             "name": self.name,
             "email": self.email,
             "is_active": self.is_active,
-            "role": self.role
+            # "role": self.role
+            "gender": self.gender,
         }
 
 class Notes(db.Model):

@@ -60,6 +60,7 @@ def create_user():
         email = request_body["email"]
         password = request_body["password"]  
         name = request_body["name"]
+        gender = request_body["gender"]
 
         if not email or not password or not name:
             return jsonify({"msg": "missing data"}), 400 
@@ -75,10 +76,12 @@ def create_user():
         # 3. Crear nuevo usuario
         new_user = User(
             name=request_body["name"],
+            
             email=request_body["email"],
             password=hashed_password,
             is_active=True,
-            role=3
+            # role=3,
+            gender=request_body["gender"]
             
         )
 
