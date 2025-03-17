@@ -43,7 +43,7 @@ const Layout = () => {
                         <Route element={<Register />} path="/register" />
                         <Route element={<EditProfile />} path="/editprofile" />
                         <Route element={<Pomodoro />} path="/pomodoro" />
-                        <Route element={<HabitTracker />} path="/habit-tracker" />  
+                        <Route element={<HabitTracker />} path="/habits" />  
                     </Routes>
                     <Footer />
                 </ScrollToTop>
