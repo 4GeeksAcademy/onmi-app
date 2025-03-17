@@ -77,13 +77,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			
-			register: async (name, email, password) => {
+			register: async (name, email, gender, password) => {
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
 
 				const raw = JSON.stringify({
 					"name": name,
 					"email": email,
+					"gender": gender,
 					"password": password
 				});
 
@@ -151,7 +152,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const result = await response.json();
 					console.log(response);
 
-					console.log(result)
+					setStore({"notes":result.resul})
 					//setStore({ message: data.message })
 				} catch (error) {
 					console.error(error);

@@ -76,10 +76,10 @@ def create_user():
         new_user = User(
             name=request_body["name"],
             email=request_body["email"],
+            gender=request_body["gender"],
             password=hashed_password,
             is_active=True,
-            # role=3
-            
+            role= "USER"
         )
 
         db.session.add(new_user)
