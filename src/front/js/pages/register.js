@@ -146,9 +146,7 @@ export const Register = () => {
                 <option value="" disabled>Select Gender</option>
                 <option value="MALE">Male</option>
                 <option value="FEMALE">Female</option>
-                <option value="NON_BINARY">Non-binary</option>
-                <option value="OTHER">Other</option>
-                <option value="PREFER_NOT_TO_SAY">Prefer_not_to_say</option>
+                <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
               </select>
             </div>
             <button
