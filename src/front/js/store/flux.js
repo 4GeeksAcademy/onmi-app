@@ -18,6 +18,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 			],
 			notes: [],
 			//estado julia 
+			emotions: {
+				currentEmotion: "neutral",
+				counts:{
+					happy: 0,
+					love: 0,
+					neutral: 0,
+					mad: 0,
+					sad: 0
+				},
+
+			lastDate: 
+			new Date().toDateString()
+			},
 
 			//maldit pomodoro estado:
 			pomodoroTime: 1500, // 25 min en segundos
@@ -64,16 +77,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log(result)
 
 					if (!response.ok) {
+						console.error("Error en el inicio de sesión:", result.message || "Respuesta no válida");
 						return false
 					}
+					if (!result.access_token) {
+						console.error("No se recibió un token válido:", result);
+						return false;
+					}
 					localStorage.setItem("token", result.access_token)
-					setStore({ auth: true })
+					// Guarda el email del usuario autenticado
+					localStorage.setItem("userEmail", email); // data.email proviene del backend
+				setStore({ auth: true })
 
-					return true
-				} catch (error) {
-					console.error(error);
-				};
-			},
+				console.log("Usuario autenticado correctamente");
+
+				return true;
+			} catch (error) {
+				console.error("Error durante el inicio de sesión:", error);
+				return false;
+			}
+		},
 
 
 			
@@ -117,6 +140,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			verifyToken: async () => {
+				
 				let token = localStorage.getItem("token")
 				const myHeaders = new Headers();
 				myHeaders.append("Authorization", `Bearer ${token}`);
@@ -554,15 +578,68 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ userGender: user.gender || "prefer_not_to_say" });
 				})
 				.catch(error => console.error("Error al obtener el género:", error));
-			}
+			},
+
+			setEmotion: (emotion) => {
+				const store = getStore();
+				const userEmail = localStorage.getItem("userEmail"); // Recuperar el email del usuario
+				if (!userEmail) {
+					console.error("No se encontró un email. Asegúrate de que el usuario haya iniciado sesión correctamente.");
+					return;
+				}
 			
+				const isNewDay = store.emotions.lastDate !== new Date().toDateString();
+				const newCounts = isNewDay
+					? { happy: 0, love: 0, neutral: 0, mad: 0, sad: 0 } // Reinicia si es un nuevo día
+					: { ...store.emotions.counts };
+			
+				newCounts[emotion] += 1;
+			
+				const updatedEmotions = {
+					currentEmotion: emotion,
+					counts: newCounts,
+					lastDate: new Date().toDateString(),
+				};
+			
+				setStore({ emotions: updatedEmotions });
+				localStorage.setItem(`emotions_${userEmail}`, JSON.stringify(updatedEmotions)); // Guarda datos específicos usando el email
+			},
+			
+
+			emotionFromLocalStorage: () => {
+				const userEmail = localStorage.getItem("userEmail"); // Recuperar el email del usuario actual
+				if (!userEmail) {
+					console.error("No se encontró un email. Asegúrate de que el usuario haya iniciado sesión correctamente.");
+					return;
+				}
+			
+				const savedData = JSON.parse(localStorage.getItem(`emotions_${userEmail}`)); // Usa el email como clave
+				if (savedData) {
+					setStore({ emotions: savedData });
+				} else {
+					// Inicializar datos para un nuevo usuario
+					setStore({
+						emotions: {
+							currentEmotion: "neutral",
+							counts: {
+								happy: 0,
+								love: 0,
+								neutral: 0,
+								mad: 0,
+								sad: 0,
+							},
+							lastDate: new Date().toDateString(),
+						},
+					});
+				}
+			},
 			
 
 
 			
-		}
+		},
 
-	}
+	};
 };
 
 export default getState;

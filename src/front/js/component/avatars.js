@@ -1,8 +1,10 @@
-import React, { useState,useEffect } from "react";
-
+import React, { useContext, useState,useEffect } from "react";
+import { Context } from "../store/appContext"; // Importa el contexto
 
 export const Avatars = ({ gender }) => {
-  const [emotion, setEmotion] = useState("neutral");
+  // const [emotion, setEmotion] = useState("neutral");
+  const { store, actions } = useContext(Context);
+  const emotion = store.emotions.currentEmotion;
 
   // ✅ Ruta ajustada para encontrar las imágenes correctamente
   const getAvatarImg = () => {
@@ -21,9 +23,7 @@ useEffect(() => {
 
   return (
     <div className="avatar-container">
-      {/* <h2>My Avatar</h2> */}
-
-      {/* ✅ Manejo de errores mejorado para cargar imagen alternativa */}
+     
       <img
         src={getAvatarImg()}
         alt="Avatar"
@@ -37,7 +37,7 @@ useEffect(() => {
       {/* <img src="/img/a.female_neutral.gif" alt="Test Avatar" /> */}
 
 
-      {/* ✅ Botones para cambiar emoción */}
+      {/* Botones para cambiar emoción */}
       <div className="btn-group mt-3" role="group" aria-label="Basic radio toggle button group">
         {["happy", "love", "neutral", "mad", "sad"].map((em) => (
           <button
@@ -46,7 +46,7 @@ useEffect(() => {
            
             name="btnradio"
             className={`btn ${emotion === em ? "btn-primary" : "btn-outline-primary"}`}
-            onClick={() => setEmotion(em)}
+            onClick={() => actions.setEmotion(em)}
           >
             {em === "happy"
               ? "😄"

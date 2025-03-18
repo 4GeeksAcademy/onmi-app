@@ -8,6 +8,7 @@ import 'react-calendar/dist/Calendar.css';
 import { Pomodoro } from "../component/pomodoro";
 import pomodoro_exp from "../../img/pomodoro_exp.png"
 import { Avatars } from "../component/avatars";
+import { EmotionCounter } from "../component/emotionCounter";
 
 const emotionsMap = {
   happy: "😄",
@@ -28,25 +29,35 @@ export const Profile = () => {
   
   const userGender = localStorage.getItem("gender") || "prefer_not_to_say";
 
-  console.log("Género actual del usuario:", store.userGender);
-  console.log("Prop gender pasada al Avatar:", store.userGender);
+  // console.log("Género actual del usuario:", store.userGender);
+  // console.log("Prop gender pasada al Avatar:", store.userGender);
 
 
   useEffect(() => {
     actions.getGender();
 }, []);
 
+useEffect(() => {
+  const userEmail = localStorage.getItem("userEmail");
+  if (userEmail) {
+      actions.emotionFromLocalStorage(); // Cargar datos de emociones específicos para este email
+  } else {
+      console.log("No hay un usuario autenticado.");
+  }
+}, []);
+
+
 console.log("Género actual en el store:", store.userGender);
 
 
   return (
-    <div className="parent container" style={{ position: 'relative',  }}> 
+    <div className="parent container" style={{ position: "relative", justifyContent: "center", alignItems: 'center', textAlign: "center" }}> 
 
       <div className="calendar">
         <div className="title ">
-          <h1 className='text-center'>Calendar</h1>
+          <h1 className='text-start'>My Calendar</h1>
         </div>
-        <div className='calendar-container pr-3'>
+        <div className='calendar-container '>
           <Calendar onChange={setDate} value={date} />
 
           <p className='text-center mt-3'>
@@ -58,59 +69,19 @@ console.log("Género actual en el store:", store.userGender);
       <div className="container mt-5 " id="middle" style={{ position: "relative", justifyContent: "center", alignItems: 'center', textAlign: "center" }}>
         <h1> <b>How are you feeling today?</b></h1>
 
-        <Avatars gender={store.userGender} emotion={selectedEmotion} setEmotion={setSelectedEmotion} />
-        
-
-
-{/* 
-        <div className="btn-group mt-3" role="group" aria-label="Basic radio toggle button group">
-
-          {Object.entries(emotionsMap).map(([emotion, emoji]) => (
-
-        <React.Fragment key={emotion}>
-              <input
-                type="radio"
-                className="btn-check"
-                name="btnradio"
-                id={emotion}
-                autoComplete="off"
-                onChange={() => setSelectedEmotion(emotion)}
-              />
-
-                <label
-                className={`btn ${selectedEmotion === emotion ? "btn-primary" : "btn-outline-primary"}`}
-                htmlFor={emotion}
-              >
-                {emoji}
-              </label>
-            </React.Fragment>
-))}
- </div> */}
-          {/* <input type="radio" className="btn-check" name="btnradio" id="bien" autoComplete="off" onChange={() => setSelected("bien")} />
-          <label className={`btn ${selected === "bien" ? "btn-primary" : "btn-outline-primary"}`} htmlFor="bien">😄 </label>
-
-          <input type="radio" className="btn-check" name="btnradio" id="enamorado" autoComplete="off" onChange={() => setSelected("enamorado")} />
-          <label className={`btn ${selected === "enamorado" ? "btn-primary" : "btn-outline-primary"}`} htmlFor="enamorado">🥰</label>
-
-          <input type="radio" className="btn-check" name="btnradio" id="regular" autoComplete="off" onChange={() => setSelected("regular")} />
-          <label className={`btn ${selected === "regular" ? "btn-primary" : "btn-outline-primary"}`} htmlFor="regular">😑</label>
+        {/* <Avatars gender={store.userGender} emotion={selectedEmotion} setEmotion={setSelectedEmotion} /> */}
+        <Avatars
+            gender={store.userGender}
+            emotion={store.emotions.currentEmotion} // Ahora viene del store
+            setEmotion={actions.setEmotion} // Llamamos directamente a la acción
+          />
 
         
-          <input type="radio" className="btn-check" name="btnradio" id="enfadado" autoComplete="off" onChange={() => setSelected("enfadado")} />
-          <label className={`btn ${selected === "enfadado" ? "btn-primary" : "btn-outline-primary"}`} htmlFor="enfadado">😡</label>
-
-          <input type="radio" className="btn-check" name="btnradio" id="triste" autoComplete="off" onChange={() => setSelected("triste")} />
-          <label className={`btn ${selected === "triste" ? "btn-primary" : "btn-outline-primary"}`} htmlFor="triste">😭</label> */}
-       
-
-
-        <div className="container mt-5 mb-5" >
-          <button> Check my progress </button>
-        </div>
-
+        <EmotionCounter emotions={store.emotions.count}/>
+        
       </div>
 
-
+        {/* //explicación y pomodoro */}
 
       <div className="pomodoro container">
       
@@ -118,7 +89,7 @@ console.log("Género actual en el store:", store.userGender);
 ❓
 </button>
 <br></br>
-<div className="modal fade" id="explanation" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div className="modal fade" id="explanation" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div className="modal-dialog">
     <div className="modal-content">
       <div className="modal-header">
