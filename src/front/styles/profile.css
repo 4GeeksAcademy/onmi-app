@@ -10,7 +10,7 @@ div.calendar-container{
     
     width: 400px;
     background-color: #6fbed22e;
-   transform: scale(1.02);
+   transform: scale(1);
     justify-content: center;
     align-items: center;
     border-radius: 10% 10% ;
@@ -51,7 +51,9 @@ a{
 div.btn-group{
     background-color: #ffffff;
     border-radius: 40% 40% 40% 40% !important;
-    transform: scale(1.5);
+    transform: scale(1.4);
+    border-color: black;
+    
 
 }
 
@@ -75,11 +77,11 @@ button{
     
 }
 
-img.female{
+/* img.female{
     width: 300px;
     height: 300px;
     
-}
+} */
 
 div#middle.container{
     margin-left: 30px;

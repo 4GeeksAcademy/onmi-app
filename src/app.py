@@ -64,16 +64,31 @@ def sitemap():
     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
+# @app.route('/<path:path>', methods=['GET'])
+# def serve_any_other_file(path):
+#     if not os.path.isfile(os.path.join(static_file_dir, path)):
+#         path = 'index.html'
+#     response = send_from_directory(static_file_dir, path)
+#     response.cache_control.max_age = 0  # avoid cache memory
+#     return response
+
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
+    # Comprueba si el archivo existe en el directorio estático
     if not os.path.isfile(os.path.join(static_file_dir, path)):
-        path = 'index.html'
+        # Devuelve un error 404 si el archivo no se encuentra
+        return jsonify({"error": f"File '{path}' not found"}), 404
+    # Sirve el archivo si existe
     response = send_from_directory(static_file_dir, path)
-    response.cache_control.max_age = 0  # avoid cache memory
+    response.cache_control.max_age = 0  # evitar el caché del navegador
     return response
+
+@app.route('/img/<filename>', methods=['GET'])
+def serve_image(filename):
+    return send_from_directory(os.path.join(static_file_dir, 'img'), filename)
 
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
-    PORT = int(os.environ.get('PORT', 3001))
+    PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=True)

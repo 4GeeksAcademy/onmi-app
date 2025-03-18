@@ -6,11 +6,11 @@ from enum import Enum as PyEnum
 db = SQLAlchemy()
 
 class Gender(PyEnum):
-    MALE = "Male"
-    FEMALE = "Female"
+    male = "male"
+    female = "female"
     NON_BINARY = "Non-binary"
     OTHER = "Other"
-    PREFER_NOT_TO_SAY = "Prefer not to say"
+    prefer_not_to_say = "prefer not to say"
 
 class Role(PyEnum):
     ADMIN = "Admin"
@@ -24,7 +24,7 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(500))
-    gender: Mapped[Gender] = mapped_column(String(Gender), nullable=False)
+    gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     role: Mapped[Role] = mapped_column(Enum(Role), nullable=False, default=Role.USER)
     notes: Mapped["Notes"] = relationship(back_populates="user")
@@ -40,7 +40,7 @@ class User(db.Model):
             "email": self.email,
             "gender": self.gender.value,
             "is_active": self.is_active,
-            "role": self.role
+            "role": self.role.value
         }
 
 class Notes(db.Model):

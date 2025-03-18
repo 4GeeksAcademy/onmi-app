@@ -25,7 +25,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			completedCycles: Number(localStorage.getItem("cycles")) || 0,
 
 			//estado compañero
-
+			
 
 
 
@@ -530,6 +530,36 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 
 			},
+
+
+
+			getGender: () => {
+				fetch(process.env.BACKEND_URL + "/api/user/me", {
+					method: "GET",
+					headers: {
+						"Authorization": `Bearer ${localStorage.getItem("token")}`,
+						"Content-Type": "application/json",
+					}
+				})
+				.then(response => {
+					if (!response.ok) {
+						throw new Error(`Error al obtener los datos: ${response.status}`);
+					}
+					return response.json();
+				})
+				.then(user => {
+					console.log("Usuario autenticado desde el backend:", user);
+			
+					// Actualiza el estado global con los datos del usuario autenticado
+					setStore({ userGender: user.gender || "prefer_not_to_say" });
+				})
+				.catch(error => console.error("Error al obtener el género:", error));
+			}
+			
+			
+
+
+			
 		}
 
 	}
