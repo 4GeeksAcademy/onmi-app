@@ -84,14 +84,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.error("No se recibió un token válido:", result);
 						return false;
 					}
+					// Guardar el token solo si el backend lo envió manejo de errores
+					if (result.access_token) {
 					localStorage.setItem("token", result.access_token)
 					// Guarda el email del usuario autenticado
-					localStorage.setItem("userEmail", email); // data.email proviene del backend
+					localStorage.setItem("userEmail", email); // añadidonuevo
 				setStore({ auth: true })
 
 				console.log("Usuario autenticado correctamente");
 
-				return true;
+				return true;}
 			} catch (error) {
 				console.error("Error durante el inicio de sesión:", error);
 				return false;
@@ -127,6 +129,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					// Guardar el token solo si el backend lo envió
 					if (result.access_token) {
 						localStorage.setItem("token", result.access_token);
+						localStorage.setItem("userEmail", email);
 						return true
 					} else {
 						console.warn("El servidor no devolvió un token.");
@@ -582,13 +585,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			setEmotion: (emotion) => {
 				const store = getStore();
-				const userEmail = localStorage.getItem("userEmail"); // Recuperar el email del usuario
+				const userEmail = localStorage.getItem("userEmail");
+					
 				if (!userEmail) {
 					console.error("No se encontró un email. Asegúrate de que el usuario haya iniciado sesión correctamente.");
 					return;
 				}
-			
-				const isNewDay = store.emotions.lastDate !== new Date().toDateString();
+				const todayDate = new Date().toISOString().split('T')[0];
+				const isNewDay = store.emotions.lastDate !== todayDate;
 				const newCounts = isNewDay
 					? { happy: 0, love: 0, neutral: 0, mad: 0, sad: 0 } // Reinicia si es un nuevo día
 					: { ...store.emotions.counts };
@@ -598,14 +602,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const updatedEmotions = {
 					currentEmotion: emotion,
 					counts: newCounts,
-					lastDate: new Date().toDateString(),
+					lastDate: todayDate,
 				};
 			
 				setStore({ emotions: updatedEmotions });
 				localStorage.setItem(`emotions_${userEmail}`, JSON.stringify(updatedEmotions)); // Guarda datos específicos usando el email
 			},
 			
-
+			
 			emotionFromLocalStorage: () => {
 				const userEmail = localStorage.getItem("userEmail"); // Recuperar el email del usuario actual
 				if (!userEmail) {
@@ -614,25 +618,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			
 				const savedData = JSON.parse(localStorage.getItem(`emotions_${userEmail}`)); // Usa el email como clave
-				if (savedData) {
-					setStore({ emotions: savedData });
-				} else {
-					// Inicializar datos para un nuevo usuario
+				const todayDate = new Date().toISOString().split('T')[0];
+
+				// Inicializa si no hay datos guardados o si es un nuevo día
+				if (!savedData || savedData.lastDate !== todayDate) {
 					setStore({
 						emotions: {
 							currentEmotion: "neutral",
-							counts: {
-								happy: 0,
-								love: 0,
-								neutral: 0,
-								mad: 0,
-								sad: 0,
-							},
-							lastDate: new Date().toDateString(),
+							counts: { happy: 0, love: 0, neutral: 0, mad: 0, sad: 0 },
+							lastDate: todayDate,
 						},
 					});
+				} else {
+					console.log(`Cargando emociones para: ${userEmail}`);
+					setStore({ emotions: savedData });
+				
 				}
 			},
+
+
+			
 			
 
 

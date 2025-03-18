@@ -10,7 +10,7 @@ class Gender(PyEnum):
     female = "female"
     NON_BINARY = "Non-binary"
     OTHER = "Other"
-    prefer_not_to_say = "prefer not to say"
+    prefer_not_to_say = "prefer_not_to_say"
 
 class Role(PyEnum):
     ADMIN = "Admin"

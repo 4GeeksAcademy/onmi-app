@@ -37,17 +37,32 @@ export const Profile = () => {
     actions.getGender();
 }, []);
 
+// useEffect(() => {
+//   const userEmail = localStorage.getItem("userEmail");
+//   if (userEmail) {
+//       actions.emotionFromLocalStorage(); // Cargar datos de emociones específicos para este email
+//   } else {
+//       console.log("No hay un usuario autenticado.");
+//   }
+// }, []);
+
 useEffect(() => {
-  const userEmail = localStorage.getItem("userEmail");
-  if (userEmail) {
-      actions.emotionFromLocalStorage(); // Cargar datos de emociones específicos para este email
-  } else {
-      console.log("No hay un usuario autenticado.");
-  }
-}, []);
+  const loadUserData = async () => {
+      const email = localStorage.getItem("userEmail");
+      if (email) {
+        console.log(`Cargando datos para: ${email}`);
+        await actions.emotionFromLocalStorage(); // Corregido el llamado
+      } else {
+        console.error("No se encontró el email al cargar datos.");
+      }
+    };
+
+    loadUserData();
+  }, []);
 
 
 console.log("Género actual en el store:", store.userGender);
+console.log("Email guardado:", localStorage.getItem("userEmail"));
 
 
   return (
