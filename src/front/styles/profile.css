@@ -1,7 +1,12 @@
-.parent{
-    display: inline-flex;
+.parent {
+    display: flex; /* Cambiado de inline-flex para mejor control de flujo */
+    flex-direction: row; /* Alinea los elementos horizontalmente */
     align-items: center;
-    justify-content: space-between;
+    justify-content: center; /* Centra todo vertical y horizontalmente */
+    
+    gap: 50px; /* Espacio entre los elementos */
+    height: 90vh; /* Asegura que ocupe toda la altura de la ventana */
+    margin: 0 auto;
 }
     
 
@@ -84,9 +89,29 @@ button{
 } */
 
 div#middle.container{
-    margin-left: 30px;
-    margin-right: 30px;
+    margin-left: 50px;
+    margin-right: 50px;
 }
 
+div#middle.container > * {
+    margin-bottom: 100px; /* Añade espacio debajo de cada elemento */
+}
 
+div#middle.container > *:last-child {
+    margin-bottom: 0; /* Quita el margen al último elemento */
+}
 
+div.pomodoro.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+img.avatar-image{
+    width: 300px;
+    height:300px;
+    border-radius: 50%;
+    
+}

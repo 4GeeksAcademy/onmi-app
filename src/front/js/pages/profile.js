@@ -40,7 +40,7 @@ console.log("Género actual en el store:", store.userGender);
 
 
   return (
-    <div className="parent container "> 
+    <div className="parent container" style={{ position: 'relative',  }}> 
 
       <div className="calendar">
         <div className="title ">
@@ -55,7 +55,7 @@ console.log("Género actual en el store:", store.userGender);
           </p>
         </div>
       </div>
-      <div className="container mt-5 " id="middle" style={{ justifyContent: "center", alignItems: 'center', textAlign: "center" }}>
+      <div className="container mt-5 " id="middle" style={{ position: "relative", justifyContent: "center", alignItems: 'center', textAlign: "center" }}>
         <h1> <b>How are you feeling today?</b></h1>
 
         <Avatars gender={store.userGender} emotion={selectedEmotion} setEmotion={setSelectedEmotion} />
