@@ -308,24 +308,25 @@ def create_habit():
 
         # Obtener el usuario autenticado desde el token
         current_user_email = get_jwt_identity()
+        print(current_user_email)
         user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
 
         if not user:
             return jsonify({"error": "Usuario no encontrado"}), 404
 
         # Validar que todos los campos obligatorios estén en la solicitud
-        required_fields = ["name", "description", "category", "goals_id", "ready"]
+        required_fields = ["title", "category"]
         if not all(field in request_body for field in required_fields):
             return jsonify({"error": "Todos los campos son obligatorios"}), 400
 
         # Crear nueva instancia de Habit asignando automáticamente el user_id
         new_habit = Habits(
-            name=request_body["name"],
-            description=request_body["description"],
+            name=request_body["title"],
+            description=None,
             category=request_body["category"],
             user_id=user.id,  # 🔥 Se asigna automáticamente con el usuario autenticado
-            goals_id=request_body["goals_id"],
-            ready=request_body["ready"]
+            goals_id=None,
+            ready=False
         )
 
         # Guardar en la base de datos

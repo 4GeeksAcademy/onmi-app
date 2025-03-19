@@ -4,6 +4,11 @@ from sqlalchemy import Integer, Enum, String, ForeignKey, Boolean, Column, Strin
 from enum import Enum as PyEnum
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from sqlalchemy import Integer, Enum, String, ForeignKey, Boolean, DateTime, func
+from enum import Enum as PyEnum
+from werkzeug.security import generate_password_hash, check_password_hash
+from typing import List
+
 db = SQLAlchemy()
 
 class Gender(PyEnum):
@@ -81,22 +86,41 @@ class Habits(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(String(1000), nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), nullable=True)
     category: Mapped[str] = mapped_column(String(100), nullable=True)
     ready: Mapped[bool]
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(back_populates="habits")
-    goals_id: Mapped[int] = mapped_column(ForeignKey("goals.id"))
+    goals_id: Mapped[int] = mapped_column(ForeignKey("goals.id"), nullable=True)
     goals: Mapped["Goals"] = relationship(back_populates="habits")
+    tracker: Mapped[List["HabitsTracker"]] = relationship("HabitsTracker", back_populates="habit") 
 
     def serialize(self):
-        
         return {
             "id": self.id,
             "name": self.name,
             "description": self.description,
             "category": self.category,
-            "ready": self.ready
+            "ready": self.ready,
+            "dates": [item.serialize() for item in self.tracker],  
+            "count": len(self.tracker)
+        }
+    
+class HabitsTracker(db.Model):
+    __tablename__ = "habitstracker"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    habit_id: Mapped[int] = mapped_column(ForeignKey("habits.id"))
+    completed_at: Mapped[datetime] = mapped_column(DateTime,server_default=func.now())
+    success: Mapped[bool] = mapped_column(Boolean, default=True)
+    habit: Mapped["Habits"] = relationship("Habits", back_populates="tracker")  # Corregido
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "habit_id": self.habit_id,
+            "completed_at": self.completed_at.isoformat(),
+            "success": self.success
         }
 
 class Goals(db.Model):
