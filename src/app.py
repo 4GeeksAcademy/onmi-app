@@ -10,6 +10,7 @@ from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from flask_jwt_extended import JWTManager
 
 # from models import Person
 
@@ -18,6 +19,10 @@ static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+jwt = JWTManager(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -30,6 +35,8 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+
+
 
 # add the admin
 setup_admin(app)
@@ -57,16 +64,31 @@ def sitemap():
     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
+# @app.route('/<path:path>', methods=['GET'])
+# def serve_any_other_file(path):
+#     if not os.path.isfile(os.path.join(static_file_dir, path)):
+#         path = 'index.html'
+#     response = send_from_directory(static_file_dir, path)
+#     response.cache_control.max_age = 0  # avoid cache memory
+#     return response
+
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
+    # Comprueba si el archivo existe en el directorio estático
     if not os.path.isfile(os.path.join(static_file_dir, path)):
-        path = 'index.html'
+        # Devuelve un error 404 si el archivo no se encuentra
+        return jsonify({"error": f"File '{path}' not found"}), 404
+    # Sirve el archivo si existe
     response = send_from_directory(static_file_dir, path)
-    response.cache_control.max_age = 0  # avoid cache memory
+    response.cache_control.max_age = 0  # evitar el caché del navegador
     return response
+
+@app.route('/img/<filename>', methods=['GET'])
+def serve_image(filename):
+    return send_from_directory(os.path.join(static_file_dir, 'img'), filename)
 
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
-    PORT = int(os.environ.get('PORT', 3001))
+    PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=True)

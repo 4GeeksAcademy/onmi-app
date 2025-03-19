@@ -1,0 +1,100 @@
+.projects-container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.projects-title {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.projects-form {
+    margin-bottom: 20px;
+}
+
+.projects-form input,
+.projects-form select {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.projects-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.projects-table th, .projects-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.projects-table th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.projects-table td {
+    text-align: center;
+}
+
+.projects-urgency-high {
+    color: white;
+    background-color: red;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.projects-urgency-medium {
+    color: white;
+    background-color: orange;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.projects-urgency-low {
+    color: white;
+    background-color: blue;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.projects-status-completed {
+    color: white;
+    background-color: green;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.projects-status-in-progress {
+    color: white;
+    background-color: blue;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.projects-status-inactive {
+    color: black;
+    background-color: lightgray;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.projects-button {
+    background-color: #78A0AF;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.projects-button:hover {
+    background-color: #78A0AF;
+}

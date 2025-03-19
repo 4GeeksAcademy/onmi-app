@@ -1,0 +1,117 @@
+.parent {
+    display: flex; /* Cambiado de inline-flex para mejor control de flujo */
+    flex-direction: row; /* Alinea los elementos horizontalmente */
+    align-items: center;
+    justify-content: center; /* Centra todo vertical y horizontalmente */
+    
+    gap: 50px; /* Espacio entre los elementos */
+    height: 90vh; /* Asegura que ocupe toda la altura de la ventana */
+    margin: 0 auto;
+}
+    
+
+div.calendar-container{
+    /* border-style: solid; */
+    margin-left: -10%;
+    width: 400px;
+    background-color: #6fbed22e;
+   transform: scale(1);
+    justify-content: flex-start;
+    position: flex-start;
+    border-radius: 10% 10% ;
+   
+    padding: 2% 2% 4% 0%;
+    
+
+}
+
+
+div.react-calendar{
+   
+    margin-left: 25px;
+    border-radius: 10% 10%;
+    background-color: #78a0af92;
+    justify-content: center;
+    padding: 2% 2% 2% 2%;
+    
+}
+
+h1{
+    color: #78A0AF;
+}
+h2{
+   
+    color:#78A0AF
+}
+
+a{
+    color: #78A0AF;
+    display: flex;
+    font-size:small;
+    margin-top: 5px;
+}
+
+
+
+div.btn-group{
+    background-color: #ffffff;
+    border-radius: 40% 40% 40% 40% !important;
+    transform: scale(1.4);
+    border-color: black;
+    
+
+}
+
+.btn-primary { /* Cambia el color cuando está seleccionado */
+    background-color: #78A0AF !important;
+    border-color: #78A0AF !important;
+}
+
+.btn-outline-primary { /* Borde azul cuando NO está seleccionado ese !important es para sobreescribir los valores de bootstrap*/
+    background-color: #ffffff !important;
+    border-color: #78A0AF !important;
+    color: #78A0AF !important;
+}
+
+button{
+    border-color: #78A0AF;
+    background-color: #78A0AF;
+    border-radius: 50% 50% 50% 50%;
+    color:#ffffff;
+    padding: 2% 1% 2% 1%;
+    
+}
+
+/* img.female{
+    width: 300px;
+    height: 300px;
+    
+} */
+
+div#middle.container{
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+div#middle.container > * {
+    margin-bottom: 100px; /* Añade espacio debajo de cada elemento */
+}
+
+div#middle.container > *:last-child {
+    margin-bottom: 0; /* Quita el margen al último elemento */
+}
+
+div.pomodoro.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+img.avatar-image{
+    width: 300px;
+    height:300px;
+    border-radius: 0%;
+    
+}
