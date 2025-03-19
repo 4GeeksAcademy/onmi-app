@@ -479,3 +479,169 @@ def get_logged_in_user():
         print(f"Error en /user/me: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Crear una nota LISTO
+@api.route('/notes', methods=['POST'])
+@jwt_required()
+def create_note():
+    body_data = request.json
+    print(body_data)
+
+    if body_data is None:
+        raise APIException("You need to specify the request body as a json object", status_code=400)
+    if 'title' not in body_data:
+        raise APIException('You need to specify the title', status_code=400)
+    if 'description' not in body_data:
+        raise APIException('You need to specify the description', status_code=400)
+    
+    try:
+        current_user = get_jwt_identity()
+        user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one()
+        if user != None:
+
+            new_note = Notes(user_id=user.id, title=body_data["title"], description=body_data["description"], category=body_data["category"])
+            db.session.add(new_note)
+            db.session.commit()
+            print(new_note.serialize())
+
+        response_body = {
+            "new_note": new_note.serialize()
+        }
+        
+        return jsonify(response_body), 200
+    except Exception as e: 
+        #print(e)
+        return jsonify({"msg":"Not ok"}), 500
+        
+
+
+ 
+@api.route('/notes/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_note(id):
+
+    current_user = get_jwt_identity()
+    user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    # Buscar la nota con el ID dado
+    note = Notes.query.get(id)
+
+    if not note:
+        return jsonify({"msg": "Note not found"}), 404
+
+    data = request.json
+    title = data.get('title')
+    description = data.get('description')
+    category = data.get('category')
+
+    if title:
+        note.title = title
+    if description:
+        note.description = description
+    if category:
+        note.category = category
+
+    db.session.commit()
+
+    return jsonify({"msg": "Note updated successfully", "note": {
+        "id": note.id,
+        "title": note.title,
+        "description": note.description,
+        "category": note.category
+    }}), 200
+
+
+#Borrar note usando ID_NOTE LISTO
+@api.route('/notes/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_note(id):
+    #print(id)
+    try:
+        current_user = get_jwt_identity()
+        user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one()
+        note = db.session.execute(db.select(Notes).filter_by(id=id)).scalar_one()
+        #print(note.user_id)
+        if user.id == note.user_id:
+       
+            user_query = note
+            print(user_query.serialize())
+            db.session.delete(user_query)
+            db.session.commit()
+
+            return jsonify({"msg":"Note delete"}), 200
+    except:
+       
+        return jsonify({"msg":"Note does not exist"}), 404

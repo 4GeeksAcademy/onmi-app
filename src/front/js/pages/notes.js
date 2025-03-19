@@ -1,22 +1,42 @@
-import React, { useEffect,useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Cardnote } from "../component/cardnote";
-import { FormNote } from "../component/formNote";
 
 
 export const Notes = () => {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [category, setCategory] = useState("");
     const { store, actions } = useContext(Context);
+    // let navigate = useNavigate();
+
     const note = store.notes
-    console.log(note);
 
+    //console.log(title);
+    //console.log(description);
 
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        if (title == "" || description == "") {
+            throw new Error("Error creating the note");
+        } else {
+            //console.log(title, description);
+            let create = await actions.createNote(title, description, category)
+            // console.log(create);
+
+            if (create == true) {
+                window.location.reload();
+            }
+        }
+    }
 
 
 
 
     useEffect(() => {
-        actions.notes(); 
+        actions.notes();
     }, []);
 
 
@@ -25,25 +45,15 @@ export const Notes = () => {
             <div className="container text-center mt-5">
                 <h1>Notes</h1>
                 <div className="row row-cols-1 row-cols-md-3 g-4 mt-2">
-
-
-
-                    {note.length > 0 ? note.map((item) => <Cardnote key={item.id} title={item.tiitle} description={item.description}/>) : null}
-
-
-
-                    <Cardnote />
-                    <Cardnote />
-
-
-
+                    {note.length > 0 ? note.map((item) => <Cardnote key={item.id} id={item.id} title={item.title} description={item.description} category={item.category} />) : null}
                 </div>
             </div>
+
             <div className="fixed-bottom d-flex justify-content-end p-4">
                 <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal2">New note</button>
             </div>
 
-            <div className="modal" id="modal2" tabindex="-1" aria-labelledby="modal2Label" aria-hidden="true">
+            <form onSubmit={handleSubmit} className="modal" id="modal2" tabIndex="-1" aria-labelledby="modal2Label" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -52,51 +62,37 @@ export const Notes = () => {
                         </div>
                         <div className="modal-body">
 
-                            <FormNote />
+                            <div className="container">
+                                {/* <form onSubmit={handleSubmit}> */}
+                                <div className="mb-3">
+                                    <label htmlFor="title" className="form-label d-flex">Title</label>
+                                    <input className="form-control" id="title" type="text" value={title} onChange={(e) => { setTitle(e.target.value) }} />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="description" className="form-label d-flex">Description</label>
+                                    <textarea className="form-control" rows="3" id="description" value={description} onChange={(e) => { setDescription(e.target.value) }} />
+                                </div>
+                                {/* </form> */}
+                            </div>
 
                         </div>
                         <div className="modal-footer">
 
                             {/* lista de categorias */}
-                            <div class="dropdown-center">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Label
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Health</a></li>
-                                    <li><a class="dropdown-item" href="#">Sport</a></li>
-                                    <li><a class="dropdown-item" href="#">Education</a></li>
-                                    <li><a class="dropdown-item" href="#">Finance</a></li>
-                                </ul>
-                            </div>
+                            <select className="form-select-padding-x-lg" aria-label="Default select example" value={category} onChange={(e) => { setCategory(e.target.value) }}>
+                                <option defaultValue>Select category</option>
+                                <option value="Health">Health</option>
+                                <option value="Education">Education</option>
+                                <option value="Finance">Finance</option>
+                            </select>
 
-                            <button type="button" className="btn btn-primary">Create note</button>
+
+
+                            <button type="submit" className="btn btn-primary">Create note</button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div >
-    );
+    )
 };
-
-
-
-
-
-
-
-
-
-
-// return (
-//     <div className="container mt-5 w-50">
-//         <div className="d-flex justify-content-center fs-2 mb-2"><input className="w-75 border-2 rounded-pill text-center" type="text" placeholder="What do you need to do?" onKeyDown={agregarLista} value={tarea} onChange={agregarTarea} /></div>
-//         <ul className="my-2 p-0 d-flex justify-content-between">
-//             {/* Crear con map lista */}
-//             <div className="list-group">
-//                 {listaTareas.length > 0 ? listaTareas.map((item) => <li className="list-group-item list-group-item-dark" key={item.id}>{item.label}<button type="button" className="btn btn-light position end-0" onClick={() => eliminarTarea(item.id)}>x</button></li>) : null}
-//             </div>
-//         </ul>
-//         {listaTareas.length + ` Task left`}
-//     </div>
-// );

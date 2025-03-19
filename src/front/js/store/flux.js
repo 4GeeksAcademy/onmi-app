@@ -19,6 +19,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			],
 			notes: [],
+			updatedNote: [],
 			//estado julia 
 			emotions: {
 				currentEmotion: "neutral",
@@ -183,9 +184,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					const response = await fetch(process.env.BACKEND_URL + "/api/notes", requestOptions);
 					const result = await response.json();
-					console.log(response);
+					//console.log(response);
 
-					console.log(result)
+					setStore({ notes: result.resul })
 					//setStore({ message: data.message })
 				} catch (error) {
 					console.error(error);
@@ -624,95 +625,232 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error en la solicitud:", error); // Manejo de errores
 				}
 
+
+
+			},
+
+
+
+			getGender: () => {
+				fetch(process.env.BACKEND_URL + "/api/user/me", {
+					method: "GET",
+					headers: {
+						"Authorization": `Bearer ${localStorage.getItem("token")}`,
+						"Content-Type": "application/json",
+					}
+				})
+					.then(response => {
+						if (!response.ok) {
+							throw new Error(`Error al obtener los datos: ${response.status}`);
+						}
+						return response.json();
+					})
+					.then(user => {
+						console.log("Usuario autenticado desde el backend:", user);
+
+						// Actualiza el estado global con los datos del usuario autenticado
+						setStore({ userGender: user.gender || "prefer_not_to_say" });
+					})
+					.catch(error => console.error("Error al obtener el género:", error));
+			},
+
+			setEmotion: (emotion) => {
+				const store = getStore();
+				const userEmail = localStorage.getItem("userEmail");
+
+				if (!userEmail) {
+					console.error("No se encontró un email. Asegúrate de que el usuario haya iniciado sesión correctamente.");
+					return;
+				}
+				const todayDate = new Date().toISOString().split('T')[0];
+				const isNewDay = store.emotions.lastDate !== todayDate;
+				const newCounts = isNewDay
+					? { happy: 0, love: 0, neutral: 0, mad: 0, sad: 0 } // Reinicia si es un nuevo día
+					: { ...store.emotions.counts };
+
+				newCounts[emotion] += 1;
+
+				const updatedEmotions = {
+					currentEmotion: emotion,
+					counts: newCounts,
+					lastDate: todayDate,
+				};
+
+				setStore({ emotions: updatedEmotions });
+				localStorage.setItem(`emotions_${userEmail}`, JSON.stringify(updatedEmotions)); // Guarda datos específicos usando el email
+			},
+
+
+			emotionFromLocalStorage: () => {
+				const userEmail = localStorage.getItem("userEmail"); // Recuperar el email del usuario actual
+				if (!userEmail) {
+					console.error("No se encontró un email. Asegúrate de que el usuario haya iniciado sesión correctamente.");
+					return;
+				}
+
+				const savedData = JSON.parse(localStorage.getItem(`emotions_${userEmail}`)); // Usa el email como clave
+				const todayDate = new Date().toISOString().split('T')[0];
+
+				// Inicializa si no hay datos guardados o si es un nuevo día
+				if (!savedData || savedData.lastDate !== todayDate) {
+					setStore({
+						emotions: {
+							currentEmotion: "neutral",
+							counts: { happy: 0, love: 0, neutral: 0, mad: 0, sad: 0 },
+							lastDate: todayDate,
+						},
+					});
+				} else {
+					console.log(`Cargando emociones para: ${userEmail}`);
+					setStore({ emotions: savedData });
+
+				}
+			},
+
+
 			
 
-		},
+			createNote: async (title, description, category) => {
+				let token = localStorage.getItem("token")
+				try {
 
+					const myHeaders = new Headers();
+					myHeaders.append("Content-Type", "application/json");
+					myHeaders.append("Authorization", `Bearer ${token}`);
 
+					const raw = JSON.stringify({
+						"title": title,
+						"description": description,
+						"category": category
+					});
 
-		getGender: () => {
-			fetch(process.env.BACKEND_URL + "/api/user/me", {
-				method: "GET",
-				headers: {
-					"Authorization": `Bearer ${localStorage.getItem("token")}`,
-					"Content-Type": "application/json",
-				}
-			})
-				.then(response => {
+					const requestOptions = {
+						method: "POST",
+						headers: myHeaders,
+						body: raw,
+						redirect: "follow"
+					};
+
+					const response = await fetch(process.env.BACKEND_URL + "/api/notes", requestOptions);
+					const result = await response.json();
+					console.log(result)
+					console.log(response);
+
 					if (!response.ok) {
-						throw new Error(`Error al obtener los datos: ${response.status}`);
+						console.error("Error creating the note:", result);
+						return false;
 					}
-					return response.json();
-				})
-				.then(user => {
-					console.log("Usuario autenticado desde el backend:", user);
 
-					// Actualiza el estado global con los datos del usuario autenticado
-					setStore({ userGender: user.gender || "prefer_not_to_say" });
-				})
-				.catch(error => console.error("Error al obtener el género:", error));
+					const store = getStore();
+					setStore({
+						notes: [...store.notes, result.new_note]
+					});
+
+					return true;
+
+				} catch (error) {
+					console.error(error);
+				};
+
+			},
+
+			deleteNote: async (id) => {
+				let token = localStorage.getItem("token")
+				try {
+					const requestOptions = {
+						method: "DELETE",
+						headers: {
+							"Authorization": `Bearer ${token}`
+						}
+					};
+
+					const response = await fetch(`${process.env.BACKEND_URL}/api/notes/${id}`, requestOptions);
+					const result = await response.json();
+					//console.log(response);
+					//console.log(result);
+
+					if (response.ok) {
+						console.log("Note deleted successfully");
+
+						const store = getStore();
+						const updatedNotes = store.notes.filter(note => note.id !== id);
+						setStore({ notes: updatedNotes });
+						return true;
+
+					} else {
+						const errorData = await response.json();
+						console.error("Error deleting note:", errorData.msg);
+						return false;
+					}
+
+				} catch (error) {
+					console.error(error);
+				};
+			},
+
+			updateNoteInStore: (updatedNote) => {
+				const store = getStore();
+
+				// Actualizar la lista de notas
+				const updatedNotes = store.notes.map(note =>
+					note.id === updatedNote.id ? { ...note, ...updatedNote } : note
+				);
+
+				// Guarda las notas actualizadas
+				setStore({ notes: updatedNotes });
+			},
+
+			updateNote: async (id, title, description, category) => {
+				let token = localStorage.getItem("token")
+				try {
+					const myHeaders = new Headers();
+					myHeaders.append("Content-Type", "application/json");
+					myHeaders.append("Authorization", `Bearer ${token}`)
+
+					const raw = JSON.stringify({
+						"title": title,
+						"description": description,
+						"category": category
+					});
+
+					const requestOptions = {
+						method: "PUT",
+						headers: myHeaders,
+						body: raw
+					};
+
+					const response = await fetch(`${process.env.BACKEND_URL}/api/notes/${id}`, requestOptions);
+					const result = await response.json();
+					console.log(response);
+
+					console.log(result);
+
+					const updatedNote = result.note
+
+					if (response.ok) {
+						console.log("Note updated successfully:", updatedNote);
+						setStore({ updatedNote: updatedNote })
+
+						return true;
+					} else {
+						console.error("Error editing note:", updatedNote.msg);
+						return false; // Indicar fallo
+					}
+
+				}
+				catch (error) {
+					console.error(error);
+				};
+			},
+
+
+
+
+
+
+
+
 		},
-
-		setEmotion: (emotion) => {
-			const store = getStore();
-			const userEmail = localStorage.getItem("userEmail");
-
-			if (!userEmail) {
-				console.error("No se encontró un email. Asegúrate de que el usuario haya iniciado sesión correctamente.");
-				return;
-			}
-			const todayDate = new Date().toISOString().split('T')[0];
-			const isNewDay = store.emotions.lastDate !== todayDate;
-			const newCounts = isNewDay
-				? { happy: 0, love: 0, neutral: 0, mad: 0, sad: 0 } // Reinicia si es un nuevo día
-				: { ...store.emotions.counts };
-
-			newCounts[emotion] += 1;
-
-			const updatedEmotions = {
-				currentEmotion: emotion,
-				counts: newCounts,
-				lastDate: todayDate,
-			};
-
-			setStore({ emotions: updatedEmotions });
-			localStorage.setItem(`emotions_${userEmail}`, JSON.stringify(updatedEmotions)); // Guarda datos específicos usando el email
-		},
-
-
-		emotionFromLocalStorage: () => {
-			const userEmail = localStorage.getItem("userEmail"); // Recuperar el email del usuario actual
-			if (!userEmail) {
-				console.error("No se encontró un email. Asegúrate de que el usuario haya iniciado sesión correctamente.");
-				return;
-			}
-
-			const savedData = JSON.parse(localStorage.getItem(`emotions_${userEmail}`)); // Usa el email como clave
-			const todayDate = new Date().toISOString().split('T')[0];
-
-			// Inicializa si no hay datos guardados o si es un nuevo día
-			if (!savedData || savedData.lastDate !== todayDate) {
-				setStore({
-					emotions: {
-						currentEmotion: "neutral",
-						counts: { happy: 0, love: 0, neutral: 0, mad: 0, sad: 0 },
-						lastDate: todayDate,
-					},
-				});
-			} else {
-				console.log(`Cargando emociones para: ${userEmail}`);
-				setStore({ emotions: savedData });
-
-			}
-		},
-
-
-
-
-
-
-
-	},
 
 	};
 };
