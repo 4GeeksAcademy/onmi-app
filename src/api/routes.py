@@ -60,6 +60,7 @@ def create_user():
         email = request_body["email"]
         password = request_body["password"]  
         name = request_body["name"]
+        gender = request_body["gender"]
 
         if not email or not password or not name:
             return jsonify({"msg": "missing data"}), 400 
@@ -75,6 +76,7 @@ def create_user():
         # 3. Crear nuevo usuario
         new_user = User(
             name=request_body["name"],
+            
             email=request_body["email"],
             gender=request_body["gender"],
             password=hashed_password,
@@ -419,3 +421,29 @@ def delete_user():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+
+
+
+@api.route('/user/me', methods=['GET'])
+@jwt_required()
+def get_logged_in_user():
+    try:
+        # Obtén el mail del usuario autenticado desde el token
+        current_user_email = get_jwt_identity()
+        print(f"email del usuario autenticado: {current_user_email}")
+
+        # Busca al usuario en la base de datos
+        user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one()
+        print(f"Usuario recuperado: {user.serialize()}")
+
+        return jsonify(user.serialize()), 200
+    except Exception as e:
+        # Registrar el error en los logs del servidor
+        print(f"Error en /user/me: {e}")
+        return jsonify({"error": "Internal Server Error"}), 500
+

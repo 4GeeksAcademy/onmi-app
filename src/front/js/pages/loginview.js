@@ -13,6 +13,7 @@ export const Loginview = () => {
 
   async function handleSubmit(e) {
     e.preventDefault()
+    
     //console.log(email, password);
     let logged = await actions.login(email, password)
     if (logged === false) {
