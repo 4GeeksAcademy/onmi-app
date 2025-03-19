@@ -674,7 +674,7 @@ def send_reset_email():
         db.session.commit()
 
         # Construye el enlace de reseteo
-        reset_url = f"https://jubilant-disco-v6qv6x4v666qfx46j-3000.app.github.dev/reset-password/{token}"
+        reset_url = f"{os.getenv('FRONTEND_URL', 'https://jubilant-disco-v6qv6x4v666qfx46j-3000.app.github.dev')}/reset-password/{token}"
 
         # Construye el mensaje del correo
         message = Mail(
@@ -732,5 +732,4 @@ def update_password():
     except Exception as e:
         print(f"Error interno: {str(e)}")
         return jsonify({"msg": "Error interno", "error": str(e)}), 500
-    
     
