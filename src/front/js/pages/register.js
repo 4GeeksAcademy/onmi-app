@@ -13,7 +13,7 @@ export const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    gender: ''
+    gender: '',
   });
   
   const navigate = useNavigate();
@@ -144,9 +144,9 @@ export const Register = () => {
                 required
               >
                 <option value="" disabled>Select Gender</option>
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
               </select>
             </div>
             <button

@@ -87,12 +87,6 @@ export const EditProfile = () => {
                 </form>
                 <div><DeletAccount /></div>
             </main>
-            <div className="avatar-section">
-                <div className="avatar-container">
-                    <img src="path/to/avatar.png" alt="Avatar" />
-                    <button>Change Avatar</button>
-                </div>
-            </div>
         </div>
     );
 };

@@ -7,11 +7,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 class Gender(PyEnum):
-    MALE = "Male"
-    FEMALE = "Female"
+    male = "male"
+    female = "female"
     NON_BINARY = "Non-binary"
     OTHER = "Other"
-    PREFER_NOT_TO_SAY = "Prefer not to say"
+    prefer_not_to_say = "prefer_not_to_say"
 
 class Role(PyEnum):
     ADMIN = "Admin"
