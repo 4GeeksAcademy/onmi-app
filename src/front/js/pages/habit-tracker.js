@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState,useContext,useEffect } from "react";
+import { Context } from "../store/appContext";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import "../../styles/habit-tracker.css";
@@ -8,10 +9,12 @@ export const HabitTracker = () => {
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const {store, actions}=useContext(Context);
 
     const handleAddHabit = (e) => {
         e.preventDefault();
         if (title && category) {
+            actions.PostHabits(title, category)
             const newHabit = { title, category, count: 0, dates: [] };
             setHabits([...habits, newHabit]);
             setTitle("");
@@ -30,7 +33,10 @@ export const HabitTracker = () => {
         const newHabits = habits.filter((_, i) => i !== index);
         setHabits(newHabits);
     };
-
+    useEffect(()=>{
+        actions.getHabits()
+    },[])
+    console.log(store.habitTracker)
     return (
         <div className="habit-tracker-container habit-tracker">
             <main>
@@ -53,9 +59,9 @@ export const HabitTracker = () => {
                     <button type="submit">Add a new habit</button>
                 </form>
                 <div className="habit-list">
-                    {habits.map((habit, index) => (
+                    {store.habitTracker.length>0?store.habitTracker.map((habit, index) => (
                         <div key={index} className="habit-item">
-                            <h3>{habit.title}</h3>
+                            <h3>{habit.name}</h3>
                             <p>Category: {habit.category}</p>
                             <p>Status: <span className="status-count">{habit.count}</span></p>
                             <Calendar
@@ -74,7 +80,7 @@ export const HabitTracker = () => {
                             <button onClick={() => handleIncrement(index)}>Increment</button>
                             <button onClick={() => handleDelete(index)}>Delete</button>
                         </div>
-                    ))}
+                    )):null}
                 </div>
             </main>
         </div>
