@@ -3,11 +3,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 import LandingPage from "./pages/landingpage";
-
+import { ResetPasswordForm } from "./pages/ResetPasswordForm";
 import { EditProfile } from "./pages/EditProfile";
 // import { Habits } from "./pages/habits";
 import { Loginview } from "./pages/loginview";
-import { ForgotPassword } from "./pages/resetpassword";
+import { ResetPassword } from "./pages/resetpassword";
 import { Home } from "./pages/home";
 //import { Demo } from "./pages/demo";
 //import { Single } from "./pages/single";
@@ -34,7 +34,7 @@ const Layout = () => {
                     <Routes>
                         {/* <Route element={<Home />} path="/" /> */}
                         <Route element={<Loginview />} path="/login" />
-                        <Route element={<ForgotPassword />} path="/resetpassword" />
+                        <Route element={<ResetPassword />} path="/resetpassword" />
                         <Route element={<Notes />} path="/notes" />
                         {/* <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" /> */}
@@ -46,6 +46,7 @@ const Layout = () => {
                         <Route element={<Pomodoro />} path="/pomodoro" />
                         <Route element={<HabitTracker />} path="/habits" />  
                         <Route element={<Projects />} path="/projects" />
+                        <Route element={<ResetPasswordForm />} path="/reset-password/:token" />
                     </Routes>
                     <Footer />
                 </ScrollToTop>

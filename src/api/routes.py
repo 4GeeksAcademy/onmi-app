@@ -13,6 +13,15 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from sqlalchemy.exc import NoResultFound
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta, timezone
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from dotenv import load_dotenv
+
+load_dotenv()  # Carga las variables del archivo .env
+
+sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -478,7 +487,7 @@ def get_logged_in_user():
         # Registrar el error en los logs del servidor
         print(f"Error en /user/me: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
-
+    
 
 
 
@@ -645,3 +654,83 @@ def delete_note(id):
     except:
        
         return jsonify({"msg":"Note does not exist"}), 404
+    
+
+
+@api.route('/reset-password', methods=['POST'])
+def send_reset_email():
+    try:
+        email = request.json.get('email')
+        if not email:
+            return jsonify({"msg": "Email es requerido"}), 400
+
+        user = db.session.query(User).filter_by(email=email).first()
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+
+        # Genera un token de reseteo
+        token = generate_password_hash(email + str(user.id))
+        user.reset_token = token
+        user.token_expiration = datetime.now(timezone.utc) + timedelta(hours=1)  # Expira en 1 hora
+        db.session.commit()
+
+        # Construye el enlace de reseteo
+        reset_url = f"{os.getenv('FRONTEND_URL', 'https://jubilant-disco-v6qv6x4v666qfx46j-3000.app.github.dev')}/reset-password/{token}"
+
+        # Construye el mensaje del correo
+        message = Mail(
+            from_email='onmi.app.help@gmail.com',  # Usa tu correo verificado en SendGrid
+            to_emails=email,
+            subject='Reset Password',
+            html_content=f"""
+            <p>Hello,</p>
+            <p>Click this link to reset your password:</p>
+            <a href="{reset_url}">{reset_url}</a>
+            <p>If this wasn't you, ignore this mail.</p>
+            """
+        )
+
+        # Envía el correo usando SendGrid
+        sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+        response = sg.send(message)
+
+        print(f"Email enviado: {response.status_code}")
+        return jsonify({"msg": "Email de reseteo enviado"}), 200
+
+    except Exception as e:
+        print(f"Error interno: {str(e)}")
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+    except Exception as e:
+        print(f"Error interno: {str(e)}")
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+@api.route('/update-password', methods=['POST'])
+def update_password():
+    try:
+        data = request.json
+        token = data.get('token')
+        new_password = data.get('password')
+
+        if not token or not new_password:
+            return jsonify({"msg": "Token y nueva contraseña son requeridos"}), 400
+
+        # Busca el usuario con el token válido y no expirado
+        user = db.session.query(User).filter(
+            User.reset_token == token,
+            User.token_expiration > datetime.now(timezone.utc)
+        ).first()
+
+        if not user:
+            return jsonify({"msg": "Token inválido o expirado"}), 400
+
+        # Actualiza la contraseña del usuario
+        user.set_password(new_password)
+        user.reset_token = None  # Limpia el token
+        user.token_expiration = None  # Limpia la expiración
+        db.session.commit()
+
+        return jsonify({"msg": "Contraseña actualizada exitosamente"}), 200
+
+    except Exception as e:
+        print(f"Error interno: {str(e)}")
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
+    

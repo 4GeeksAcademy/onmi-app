@@ -1,0 +1,384 @@
+[33mcommit 75a8ef2ce83828b9d17ab770a9b5129de39f6b3a[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Wed Mar 19 21:52:47 2025 +0000
+
+    reset password completado, recibe email
+
+migrations/versions/ad7f22b34d05_.py
+
+[33mcommit cf5d5f62683b5526ce0359baa62532990a1d3d20[m[33m ([m[1;31morigin/notes-todo[m[33m)[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Wed Mar 19 11:23:07 2025 +0000
+
+    notes complete all endpoints, all flux, note view and cardnote component
+
+migrations/versions/b893ed08219e_.py
+
+[33mcommit 40bdf33da6ae1afbb9d24325e95a9381966f237b[m[33m ([m[1;31morigin/editprofile[m[33m)[m
+Merge: 9431bbc 71dfbe5
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Wed Mar 19 10:31:19 2025 +0000
+
+    developactualizado
+
+[33mcommit 9431bbcbb62d893272c8cb9361a96c1521f53862[m
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Wed Mar 19 10:02:30 2025 +0000
+
+    ChangePassword finish
+
+migrations/versions/e2ec14eb3dd5_.py
+
+[33mcommit 184b09de059eae1fdea5a8f3667dbf42e5b5a629[m[33m ([m[1;31morigin/projects[m[33m)[m
+Author: Alejandro <alejandronicolasdelalamo@gmail.com>
+Date:   Wed Mar 19 09:13:40 2025 +0000
+
+    projects
+
+migrations/versions/301eb8d4ea1c_.py
+
+[33mcommit 0ec5ae090908fbd2b7af7c8d4a3cb9cec1e05f8a[m[33m ([m[1;31morigin/avatar[m[33m)[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Tue Mar 18 23:10:35 2025 +0000
+
+    arreglo de register para que no cargue datos de usuarios anteriores
+
+migrations/versions/5d1b7e2a416a_.py
+
+[33mcommit ae9d05a44ce7f4af5e6fe193b445ecd35659529d[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Tue Mar 18 21:08:08 2025 +0000
+
+    avatarfuncional+emotionscounter
+
+migrations/versions/97434b0deb06_.py
+
+[33mcommit d8693c19a61a5e6bce166a8dff8093adaa259907[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Tue Mar 18 11:12:31 2025 +0000
+
+    avatar cambia según generOgit add .!
+
+migrations/versions/97434b0deb06_.py
+
+[33mcommit ccfdfba36954c9f355c07bb5809883fbd25dfd98[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Mon Mar 17 10:52:44 2025 +0000
+
+    que es esto
+
+migrations/versions/2a96618062e2_.py
+migrations/versions/350cdd64c2ba_.py
+migrations/versions/d03fa6393704_.py
+
+[33mcommit 7284134edb8cbef951121c50836a068559f55301[m
+Merge: 036a8c6 5e9dac7
+Author: Julia <julia7backup@gmail.com>
+Date:   Mon Mar 17 10:38:49 2025 +0000
+
+    prueba
+
+[33mcommit 036a8c67f6555d80c177d1688ac99c5794934caa[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Mon Mar 17 10:28:57 2025 +0000
+
+    primera
+
+migrations/versions/350cdd64c2ba_.py
+migrations/versions/d03fa6393704_.py
+
+[33mcommit 93a42b538f94d3591058729a53b66e95b7da4900[m
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Mon Mar 17 10:21:02 2025 +0000
+
+    arreglo gender, delete acccount
+
+migrations/versions/7d0c9cb7304f_.py
+
+[33mcommit 6e09a46a284e6f51898ad34d726de0781f58a945[m
+Author: Alejandro <alejandronicolasdelalamo@gmail.com>
+Date:   Sun Mar 16 20:00:28 2025 +0000
+
+    register gender
+
+migrations/versions/04456a7b739a_.py
+
+[33mcommit 6b6725cc18306f1b5ebed833c4c907638598b7c8[m[33m ([m[1;31morigin/modeling[m[33m)[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sun Mar 16 17:18:13 2025 +0000
+
+    modelin y vistas de panel de admin
+
+migrations/versions/49ae031ded2d_.py
+
+[33mcommit 8abc4df8da0d73202e23b5da51f3930c7be2908d[m[33m ([m[1;31morigin/Habit-tracker-backend[m[33m)[m
+Merge: fcb68d4 94fceb0
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Sun Mar 16 15:10:37 2025 +0000
+
+    habit new actualizado
+
+[33mcommit f5f4bebc79a359407d403e85bc91ad5e7d968fd3[m
+Merge: d02875f ed23442
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Sat Mar 15 12:51:15 2025 +0000
+
+    arreglo navbar1raparte
+
+[33mcommit d02875fd5c68c5b5e34b4119de2b156ddb99f2a3[m
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Sat Mar 15 12:33:54 2025 +0000
+
+    navbarsa
+
+migrations/versions/aaad605c8369_.py
+
+[33mcommit a2ce2226abf377e533722b54f0f3ea3b602db05a[m
+Merge: 12b532b ed23442
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Fri Mar 14 10:34:25 2025 +0000
+
+    cleanConsole
+
+[33mcommit c01015d332e4db7bbae17d04d5f6ca9c63da9e72[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Fri Mar 14 10:21:41 2025 +0000
+
+    clean db
+
+migrations/versions/19d0bae16ce8_.py
+migrations/versions/7fa0defff3cf_.py
+
+[33mcommit 12b532bf9b6bf5aef0f4bce4587988a5d08a35ea[m
+Merge: 36e05e6 111bc43
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Fri Mar 14 10:20:49 2025 +0000
+
+    no se
+
+[33mcommit e54ca7eb8f04f692d052cfe0253d67add8c17788[m
+Merge: ecba69f d301228
+Author: Alejandro <alejandronicolasdelalamo@gmail.com>
+Date:   Thu Mar 13 11:36:49 2025 +0000
+
+    editprofile
+
+[33mcommit 36e05e6c4530d57ae6d0dfdb613ab2383fac4c94[m
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Wed Mar 12 13:07:14 2025 +0000
+
+    endpoints post,get,detele
+
+migrations/versions/01459a57c9a8_.py
+
+[33mcommit ecba69fce458f8e29865755cc1f5a25fcbf6ac68[m
+Author: Alejandro <alejandronicolasdelalamo@gmail.com>
+Date:   Mon Mar 10 11:50:15 2025 +0000
+
+    first editprofile
+
+migrations/versions/7fa0defff3cf_.py
+
+[33mcommit 1dc5ac3318cebb91605d329b079c9be02221e188[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Mon Mar 10 10:58:40 2025 +0000
+
+    base de datos edicion de role descomentado
+
+migrations/versions/fef466e6c4fb_.py
+
+[33mcommit 139e671de7ca836cc37a43d64f966c737c767b74[m
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Sun Mar 9 21:04:17 2025 +0000
+
+    navbar mejorado
+
+migrations/versions/62a551b9827c_.py
+
+[33mcommit 032d052abce8fc0c8227f9251be029ab910ff752[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sun Mar 9 18:16:36 2025 +0000
+
+    modeling category and role, end point y flux register
+
+migrations/versions/62a551b9827c_.py
+migrations/versions/9d32e9c542af_.py
+
+[33mcommit 07e2808d6b6b403c96831ffb180b2eb5ee6e9dbf[m
+Merge: d90b65e 7194ef9
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sun Mar 9 17:12:36 2025 +0000
+
+    conflicto de migrations
+
+[33mcommit 51f3e26303571c5f78d03973acbf056f3076164b[m
+Author: Jesus F Plaz <jfplaz@gmail.com>
+Date:   Sun Mar 9 15:34:21 2025 +0000
+
+    navbar logout y auth
+
+migrations/versions/4ed3ea0fa942_.py
+migrations/versions/9d32e9c542af_.py
+
+[33mcommit e5f02aadc21811144470c8b840151925c0739632[m
+Merge: 580c99a 572284b
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sun Mar 9 13:39:33 2025 +0000
+
+    git pull de develop ultima edicion de julia
+
+[33mcommit 580c99adc2165ef1314ebd948285339570c7885a[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sun Mar 9 13:32:32 2025 +0000
+
+    cardnote y formnote
+
+migrations/versions/9a763a8a3c0f_.py
+
+[33mcommit acd793e4bd009b14ae521352d9d7e5c1e07560a1[m[33m ([m[1;31morigin/funcionalidad-register[m[33m)[m
+Author: Julia <julia7backup@gmail.com>
+Date:   Sun Mar 9 06:35:49 2025 +0000
+
+    funcionalidades login y register , alerts y encript pw
+
+migrations/versions/0050c23e095d_.py
+migrations/versions/4ed3ea0fa942_.py
+migrations/versions/56991a87e963_.py
+migrations/versions/6efe7eff7787_.py
+migrations/versions/88d24bf205f8_.py
+migrations/versions/d4599d240edd_.py
+migrations/versions/eef321fae00e_.py
+
+[33mcommit 80b6c9a7348bd320b5837152cd250bb3c7931a0e[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sat Mar 8 11:24:14 2025 +0000
+
+    fix models
+
+migrations/versions/0050c23e095d_.py
+migrations/versions/3f3b41600731_.py
+migrations/versions/56991a87e963_.py
+migrations/versions/6efe7eff7787_.py
+migrations/versions/88d24bf205f8_.py
+migrations/versions/973e507ca0fd_.py
+migrations/versions/d4599d240edd_.py
+
+[33mcommit 6abea9cfa2d286f67572e5af8b706959d4a88dd8[m
+Merge: fbdef99 20ff473
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Thu Mar 6 10:25:22 2025 +0000
+
+    Resueltos conflictos en routes.py y loginview.js
+
+[33mcommit fbdef9901a5866af30373df1e33cb843cee5af9e[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Thu Mar 6 09:32:37 2025 +0000
+
+    edicion de models y admin forms
+
+migrations/versions/973e507ca0fd_.py
+migrations/versions/d4599d240edd_.py
+
+[33mcommit 27674a7100df7d2b3169ff6093d1cb00e90f08ec[m
+Merge: adae353 83c25d7
+Author: Alejandro <alejandronicolasdelalamo@gmail.com>
+Date:   Sun Mar 2 23:31:23 2025 +0000
+
+    Merge branch 'develop' of https://github.com/4GeeksAcademy/onmi-app into register
+
+[33mcommit 6ebcd5eed1c782a899789accba973c95d9c43ed3[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sat Mar 1 17:44:05 2025 +0000
+
+    models
+
+migrations/versions/88d24bf205f8_.py
+
+[33mcommit 90964c0deb40b6c7034ad1c3102bea36f8c3f1b0[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Sat Mar 1 15:18:59 2025 +0000
+
+    correccion de modelos
+
+migrations/versions/56991a87e963_.py
+migrations/versions/6b562a354979_.py
+
+[33mcommit adae3533d40fadfb11c1397902e04cc003fbd2cb[m
+Author: Alejandro <alejandronicolasdelalamo@gmail.com>
+Date:   Fri Feb 28 11:12:48 2025 +0000
+
+    First commit
+
+migrations/versions/6efe7eff7787_.py
+
+[33mcommit 56d1fe353f2590f25db5fb84b93f4e33522a8faf[m
+Author: LMezza <mezabalza18@gmail.com>
+Date:   Fri Feb 28 10:51:35 2025 +0000
+
+    modeling
+
+migrations/versions/0050c23e095d_.py
+
+[33mcommit c18579a58a98a04a675f51e5f73cb645a73283fb[m
+Author: Luis J. Rodriguez O <ljavierrodriguez@gmail.com>
+Date:   Fri Apr 1 23:38:55 2022 +0000
+
+    Seed user table with test users using flask
+
+migrations/versions/2807edd385a2_.py
+
+[33mcommit d90d5cfe80bc5f69b89512db79fe82e58957965f[m
+Author: Alejandro Sanchez <aalejo@gmail.com>
+Date:   Fri Sep 17 19:11:09 2021 +0000
+
+    updated to bootstrap 5
+
+migrations/versions/2807edd385a2_.py
+
+[33mcommit 0bbf105da72c12855c7d8805e6b153268f7fbe0c[m
+Author: Alejandro Sanchez <aalejo@gmail.com>
+Date:   Thu Apr 8 16:40:21 2021 +0000
+
+    removing migrations
+
+migrations/versions/30fb1b056366_.py
+
+[33mcommit 0213d9c0c586435a00c5b9107b9ff00f4ba95094[m
+Author: enaguero <enaguero@gmail.com>
+Date:   Wed Feb 10 00:42:17 2021 +0000
+
+    Change the DATABASE.md documentation file from mysql to postgres
+
+migrations/versions/30fb1b056366_.py
+
+[33mcommit 4002849b5f00d506582665d0aeee085d58e5938b[m
+Author: Alejandro Sanchez <aalejo@gmail.com>
+Date:   Wed Dec 9 00:46:49 2020 +0000
+
+    small changes
+
+migrations/versions/e8f5f7f672ce_.py
+
+[33mcommit 25fb9b4373f2e4b410bc5bffa382611ec0d2a582[m
+Author: Alejandro Sanchez <aalejo@gmail.com>
+Date:   Wed Dec 9 00:46:29 2020 +0000
+
+    small changes
+
+migrations/versions/e8f5f7f672ce_.py
+
+[33mcommit 5549b94f8f3ec984e4b9a31da9cfa7e3f52c548a[m
+Author: Alejandro Sanchez <aalejo@gmail.com>
+Date:   Wed Dec 9 00:10:39 2020 +0000
+
+    reset migrations
+
+migrations/versions/c0def8a97921_.py
+
+[33mcommit 3f32b6349bcf3a82427b614fa1b9790d2dfd9c0b[m
+Author: Alejandro Sanchez <aalejo@gmail.com>
+Date:   Tue Dec 8 23:27:14 2020 +0000
+
+    trying to deploy app
+
+migrations/versions/c0def8a97921_.py

@@ -843,7 +843,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 			},
 
-
+			resetPassword: async (token, newPassword) => {
+				try {
+				  const response = await fetch(process.env.BACKEND_URL + "/api/update-password", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ token, password: newPassword })
+				  });
+			  
+				  const result = await response.json();
+				  if (!response.ok) {
+					console.error("Error:", result.msg || "Error en el servidor");
+					return false;
+				  }
+				  return true;
+				} catch (error) {
+				  console.error("Error interno:", error);
+				  return false;
+				}
+			  }
+			  
 
 
 
