@@ -383,26 +383,78 @@ const getState = ({ getStore, getActions, setStore }) => {
 				// }
 			},
 
-			DeleteHabits: async () => {
-				const myHeaders = new Headers();
-				const raw = "";
+			DeleteHabits: async (id) => {
+				let token = localStorage.getItem("token");
+			
+				if (!token) {
+					console.error("No se encontró el token en localStorage.");
+					return;
+				}
 
+				console.log("Deleting habit with ID:", id);
+
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`);
+			
 				const requestOptions = {
 					method: "DELETE",
 					headers: myHeaders,
-					body: raw,
 					redirect: "follow"
 				};
-
+			
 				try {
-					const response = await fetch(process.env.BACKEND_URL + `/api/habits/<int:id>`, requestOptions);
-					const result = await response.json();
-					console.log(result)
+					const response = await fetch(`${process.env.BACKEND_URL}/api/habits/${id}`, requestOptions);
+			
+					if (response.ok) {
+						console.log(`Habit with ID ${id} deleted successfully`);
+						const store = getStore();
+						const updatedHabits = store.habitTracker.filter(habit => habit.id !== id);
+						setStore({ habitTracker: updatedHabits });
+					} else {
+						const errorData = await response.json();
+						console.error("Error deleting habit:", errorData.message || "Unknown error");
+					}
 				} catch (error) {
-					console.error(error);
-				};
+					console.error("Error in DeleteHabits:", error);
+				}
 			},
 
+			UpdateHabit: async (id, updatedData) => {
+				let token = localStorage.getItem("token");
+			
+				if (!token) {
+					console.error("No se encontró el token en localStorage.");
+					return;
+				}
+			
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`);
+			
+				const requestOptions = {
+					method: "PUT",
+					headers: myHeaders,
+					body: JSON.stringify(updatedData),
+					redirect: "follow"
+				};
+			
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/habits/${id}`, requestOptions);
+			
+					if (response.ok) {
+						console.log(`Habit with ID ${id} updated successfully`);
+					} else {
+						const errorData = await response.json();
+						console.error("Error updating habit:", errorData.message || "Unknown error");
+					}
+				} catch (error) {
+					console.error("Error in UpdateHabit:", error);
+				}
+				},
+			
+
+			
 			AccountDelete: async () => {
 				let token = localStorage.getItem("token");
 

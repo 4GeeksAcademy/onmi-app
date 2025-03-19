@@ -13,6 +13,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from sqlalchemy.exc import NoResultFound
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
+
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -393,7 +394,39 @@ def delete_habit(id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@api.route('/habits/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_habit(id):
+    try:
+        # Obtener el usuario autenticado
+        current_user_email = get_jwt_identity()
+        user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
 
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Buscar el hábito por ID y verificar que pertenece al usuario
+        habit = db.session.execute(db.select(Habits).filter_by(id=id, user_id=user.id)).scalar_one_or_none()
+
+        if not habit:
+            return jsonify({"error": "Habit not found"}), 404
+
+        # Obtener los datos enviados en la solicitud
+        data = request.get_json()
+        count = data.get('count', habit.count)
+        dates = data.get('dates', habit.dates)
+
+        # Actualizar los campos del hábito
+        habit.count = count
+        habit.dates = dates
+
+        # Guardar los cambios en la base de datos
+        db.session.commit()
+
+        return jsonify({"message": "Habit updated successfully", "habit": habit.serialize()}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @api.route('/user', methods=['DELETE'])
 @jwt_required()  # 🔒 Protege la ruta con JWT
