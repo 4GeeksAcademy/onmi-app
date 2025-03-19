@@ -144,25 +144,32 @@ def login():
 # without a valid JWT present.
 
 
-# @api.route("/profile", methods=["GET"])
+@api.route("/profile", methods=["GET"])
+@jwt_required()
+def user_profile():
+    try:
+        # Obtener el email del usuario autenticado desde el token
+        current_user_email = get_jwt_identity()
 
-# # esto de abajo seria el portero de la analogia, entre la ruta y el metodo de autenticación 
-# @jwt_required()
-# # cuando el corrobora el token entra a la funcion y especifica
-# def protected():
-#     # Access the identity of the current user with get_jwt_identity
-#     # verifica la identidad ( de quien es el token ) , lo corrobora
-#     current_user = get_jwt_identity()
+        # Buscar al usuario en la base de datos
+        user = db.session.execute(
+            db.select(User).filter_by(email=current_user_email)
+        ).scalar_one_or_none()
 
-#     # con la identidad anterior nosotros hacemos una busqueda
+        # Verificar si el usuario existe
+        if not user:
+            return jsonify({"error": "User not found"}), 404
 
-#     # user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one()
+        # Devolver los datos del usuario
+        return jsonify({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "gender": str(user.gender)
+        }), 200
 
-
-# #con la busqueda del señor anterior en la tabla favoritos fijate cuantos tiene y traemelos 
-# # user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one()
-#     # la entidad verificada se guarda en el espacio de memoria
-#     return jsonify(logged_in_as=current_user), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @api.route("/verify-token", methods=["GET"])
@@ -423,6 +430,30 @@ def delete_user():
         return jsonify({"error": str(e)}), 500
 
 
+@api.route('/user/changepassword', methods=['PUT'])
+@jwt_required()
+def change_password():
+    current_user_email = get_jwt_identity()
+    print("current_user_email:", current_user_email)  # Agrega este registro para depurar
+
+    data = request.get_json()
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    if not current_password or not new_password:
+        return jsonify({"msg": "Se requieren las contraseñas actual y nueva"}), 400
+
+    user = User.query.filter_by(email=current_user_email).first()
+    if user is None:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    if not user.check_password(current_password):
+        return jsonify({"msg": "Contraseña actual incorrecta"}), 401
+
+    user.set_password(new_password)
+    db.session.commit()
+
+    return jsonify({"msg": "Contraseña actualizada exitosamente"}), 200
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 

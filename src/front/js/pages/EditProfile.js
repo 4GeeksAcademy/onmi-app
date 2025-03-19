@@ -1,19 +1,47 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext";
+import React, { useState, useEffect, useContext } from "react";
+import { Context } from "../store/appContext"; // Importamos el contexto
 import "../../styles/editprofile.css";
 import { DeletAccount } from "../component/ModalDeletAccount";
 
 export const EditProfile = () => {
-    const [name, setName] = useState("Matt");
-    const [email, setEmail] = useState("mattsmith@gmail.com");
+    const { store, actions } = useContext(Context); // Acceder al contexto global
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [gender, setGender] = useState("");
 
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+
+        // Asegúrate de que las contraseñas estén definidas
+        if (!currentPassword || !newPassword) {
+            alert("Por favor ingrese la contraseña actual y la nueva.");
+            return;
+        }
+
+        // Llama a la función passwordChange con las contraseñas ingresadas
+        await actions.passwordChange(currentPassword, newPassword);
+    };
+
+
+    // Cargar el perfil del usuario cuando se monte el componente
+    useEffect(() => {
+        actions.getProfile(); // Llamamos a la función para obtener el perfil
+    }, []);
+
+    // Actualizar el estado local cuando los datos del usuario cambien
+    useEffect(() => {
+        if (store.user) {
+            setName(store.user.name || "");
+            setEmail(store.user.email || "");
+            setGender(store.user.gender || "");
+        }
+    }, [store.user]); // Se ejecuta cuando store.user cambia
+
     const handleSave = (e) => {
         e.preventDefault();
-        // Aquí puedes manejar la lógica para guardar los cambios
         console.log("Profile saved", { name, email, currentPassword, newPassword, gender });
     };
 
@@ -28,6 +56,7 @@ export const EditProfile = () => {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            disabled // Deshabilita el campo, no puede ser editado
                         />
                     </label>
                     <label>
@@ -35,7 +64,7 @@ export const EditProfile = () => {
                         <input
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            disabled // El campo de email está completamente deshabilitado
                         />
                     </label>
                     <label>
@@ -54,50 +83,12 @@ export const EditProfile = () => {
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
                     </label>
-                    <button type="submit">Save</button>
+                    <button onClick={handlePasswordChange} type="submit">Save</button>
                 </form>
-                <div><DeletAccount/></div>
+                <div><DeletAccount /></div>
             </main>
-            <div className="avatar-section">
-                <div className="avatar-container">
-                    <img src="path/to/avatar.png" alt="Avatar" />
-                    <button>Change Avatar</button>
-                </div>
-                <h2>Change Avatar</h2>
-                <div className="avatar-options">
-                    <label>
-                        <input
-                            type="radio"
-                            name="gender"
-                            value="male"
-                            checked={gender === "male"}
-                            onChange={(e) => setGender(e.target.value)}
-                        />
-                        Male
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="gender"
-                            value="female"
-                            checked={gender === "female"}
-                            onChange={(e) => setGender(e.target.value)}
-                        />
-                        Female
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            name="gender"
-                            value="other"
-                            checked={gender === "other"}
-                            onChange={(e) => setGender(e.target.value)}
-                        />
-                        Other
-                    </label>
-                </div>
-            </div>
         </div>
     );
 };
+
 export default EditProfile;
