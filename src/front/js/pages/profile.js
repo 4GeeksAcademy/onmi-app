@@ -18,7 +18,7 @@ const emotionsMap = {
   sad: "😭",
 };
 
-  console.log(Object.entries(emotionsMap));
+  // console.log(Object.entries(emotionsMap));
 
 export const Profile = () => {
   const [selected, setSelected] = useState("");

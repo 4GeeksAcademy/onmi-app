@@ -1,9 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import Integer, Enum, String, ForeignKey, Boolean
+from sqlalchemy import Integer, Enum, String, ForeignKey, Boolean, Column, String, DateTime
 from enum import Enum as PyEnum
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from datetime import datetime
 db = SQLAlchemy()
 
 class Gender(PyEnum):
@@ -32,6 +32,9 @@ class User(db.Model):
     habits: Mapped["Habits"] = relationship(back_populates="user")
     goals: Mapped["Goals"] = relationship(back_populates="user")
     projects: Mapped["Projects"] = relationship(back_populates="user")
+     # Campos para manejar el reseteo de contraseña
+    reset_token: Mapped[str] = mapped_column(String(500), nullable=True)
+    token_expiration: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     def set_password(self, password):
         """Establece el hash de la contraseña."""
         self.password = generate_password_hash(password)
