@@ -1,3 +1,5 @@
+import HabitTracker from "../pages/habit-tracker";
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -39,7 +41,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			completedCycles: Number(localStorage.getItem("cycles")) || 0,
 
 			//estado compañero
-
+			habitTracker: [],
+			
 
 
 
@@ -301,62 +304,83 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 
-			PostHabits: async (name, description, category, ready, user_id, golds_id) => {
+			PostHabits: async (title, category) => {
+				console.log(title,category)
+				let token = localStorage.getItem("token");
 
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
-
+				myHeaders.append("Authorization", `Bearer ${token}`);
+								
 				const raw = JSON.stringify({
-					"name": name,
-					"description": description,
-					"category": category,
-					"user_id": user_id,
-					"golds_id": golds_id,
-					"ready": ready
+				  "title": title,
+				  "category": category
 				});
-
+				
 				const requestOptions = {
-					method: "POST",
-					headers: myHeaders,
-					body: raw,
-					redirect: "follow"
+				  method: "POST",
+				  headers: myHeaders,
+				  body: raw,
+				  redirect: "follow"
 				};
-
+				
 				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
-					const result = await response.json();
-					console.log(result)
+				const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+				const result = await response.json();
+				console.log(response)
+				if (response.status==201) {
+					getActions().getHabits()
+					
+				}
+
+				  console.log(result)
 				} catch (error) {
-					console.error(error);
+				  console.error(error);
 				};
-
-
-
-
-
 
 			},
 
 			getHabits: async () => {
+				let token = localStorage.getItem("token");
+
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`);
 
 				const requestOptions = {
-					method: "GET",
-					headers: myHeaders,
-					redirect: "follow"
+				  method: "GET",
+				  headers: myHeaders,
+				  redirect: "follow"
+				};
+				
+				try {
+				 const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+				  const result = await response.json();
+				  console.log(result)
+				  setStore({habitTracker:result})
+				} catch (error) {
+				  console.error(error);
 				};
 
-				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
-					if (!response.ok) {
-						throw new Error(`HTTP error! status: ${response.status}`);
-					}
-					const result = await response.json();
-					console.log(result);
-				} catch (error) {
-					console.error("Error fetching habits:", error); // Manejo de errores si falla la solicitud
-				}
+				// const myHeaders = new Headers();
+				// myHeaders.append("Content-Type", "application/json");
+
+				// const requestOptions = {
+				// 	method: "GET",
+				// 	headers: myHeaders,
+				// 	redirect: "follow"
+				// };
+
+				// try {
+				// 	const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+				// 	if (!response.ok) {
+				// 		throw new Error(`HTTP error! status: ${response.status}`);
+				// 	}
+				// 	const result = await response.json();
+				// 	console.log(result);
+				// } catch (error) {
+				// 	console.error("Error fetching habits:", error); // Manejo de errores si falla la solicitud
+				// }
 			},
 
 			DeleteHabits: async () => {
