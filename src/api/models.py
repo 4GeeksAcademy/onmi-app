@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import Integer, Enum, String, ForeignKey, Boolean
 from enum import Enum as PyEnum
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -24,13 +25,20 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(500))
-    gender: Mapped[Gender] = mapped_column(String(Gender), nullable=False)
+    gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     role: Mapped[Role] = mapped_column(Enum(Role), nullable=False, default=Role.USER)
     notes: Mapped["Notes"] = relationship(back_populates="user")
     habits: Mapped["Habits"] = relationship(back_populates="user")
     goals: Mapped["Goals"] = relationship(back_populates="user")
     projects: Mapped["Projects"] = relationship(back_populates="user")
+    def set_password(self, password):
+        """Establece el hash de la contraseña."""
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        """Verifica si la contraseña proporcionada coincide con el hash almacenado."""
+        return check_password_hash(self.password, password)
 
     def serialize(self):
         

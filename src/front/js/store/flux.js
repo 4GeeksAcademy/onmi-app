@@ -76,10 +76,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 
-			
+
 			register: async (name, email, gender, password) => {
 				console.log(name, email, gender, password);
-				
+
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
 
@@ -352,25 +352,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			AccountDelete: async () => {
 				let token = localStorage.getItem("token");
-			
+
 				const myHeaders = new Headers();
 				myHeaders.append("Authorization", `Bearer ${token}`);
-			
+
 				const requestOptions = {
 					method: "DELETE",
 					headers: myHeaders,
 					redirect: "follow"
 				};
-			
+
 				try {
 					const response = await fetch(process.env.BACKEND_URL + `/api/user/`, requestOptions);
-			
+
 					if (response.ok) {
 						// Eliminar el token del localStorage
 						localStorage.removeItem("token");
-			
+
 						// Redirigir al landing page
-						window.location.href = "/"; 
+						window.location.href = "/";
 					} else {
 						console.error("Error al eliminar la cuenta");
 					}
@@ -378,7 +378,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error en la solicitud:", error);
 				}
 			},
-			
+
 
 
 
@@ -508,29 +508,73 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			getProfile: async () => {
-				let token = localStorage.getItem("token")
-				try {
-					const requestOptions = {
-						mode: 'cors',
-						credentials: 'include',
-						method: "GET",
-						headers: {
-							"Authorization": `Bearer ${token}`
+				const token = localStorage.getItem("token");
+				if (token) {
+					try {
+						const response = await fetch(`${process.env.BACKEND_URL}/api/profile`, {
+							method: "GET",
+							headers: {
+								"Content-Type": "application/json",
+								"Authorization": `Bearer ${token}`,
+							},
+						});
+						if (response.ok) {
+							const data = await response.json();
+							setStore({ user: data });
+						} else {
+							console.error("Error al obtener el perfil del usuario");
 						}
-					};
-
-					const response = await fetch(process.env.BACKEND_URL + "/api/profile", requestOptions);
-					const result = await response.json();
-					console.log(response);
-
-					console.log(result)
-					setStore({ user: result })
-				} catch (error) {
-					console.error(error);
-				};
-
+					} catch (error) {
+						console.error("Error al realizar la solicitud:", error);
+					}
+				} else {
+					console.error("No se encontró el token de autenticación");
+				}
 			},
-		}
+
+			passwordChange : async (currentPassword, newPassword) => {
+
+				const token = localStorage.getItem("token");
+				if (!token) {
+					console.error("No token found");
+					return;
+				}
+			
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`); 
+				
+				// Prepara el cuerpo de la solicitud con las contraseñas proporcionadas dinámicamente
+				const raw = JSON.stringify({
+					current_password: currentPassword,
+					new_password: newPassword
+				});
+			
+				const requestOptions = {
+					method: "PUT",
+					headers: myHeaders,
+					body: raw,
+					redirect: "follow"
+				};
+			
+				try {
+					// Realiza la solicitud PUT a la API para cambiar la contraseña
+					const response =  await fetch(`${process.env.BACKEND_URL}/api/user/changepassword`, requestOptions);
+					
+					if (response.ok) {
+						const result = await response.json();
+						console.log(result); // Muestra la respuesta de la API
+					} else {
+						const error = await response.json();
+						console.error("Error:", error); // Muestra el error si la respuesta no es exitosa
+					}
+				} catch (error) {
+					console.error("Error en la solicitud:", error); // Manejo de errores
+				}
+			
+			}
+
+		},
 
 	}
 };
