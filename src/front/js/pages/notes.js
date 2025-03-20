@@ -57,7 +57,7 @@ export const Notes = () => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="modal2Label"> Hi Arnold!, what idea do you want to save?</h5>
+                            <h5 className="modal-title" id="modal2Label"> Hi! what idea do you want to save?</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
@@ -66,11 +66,11 @@ export const Notes = () => {
                                 {/* <form onSubmit={handleSubmit}> */}
                                 <div className="mb-3">
                                     <label htmlFor="title" className="form-label d-flex">Title</label>
-                                    <input className="form-control" id="title" type="text" value={title} onChange={(e) => { setTitle(e.target.value) }} />
+                                    <input className="form-control" id="title" name="title" type="text" value={title} onChange={(e) => { setTitle(e.target.value) }} />
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="description" className="form-label d-flex">Description</label>
-                                    <textarea className="form-control" rows="3" id="description" value={description} onChange={(e) => { setDescription(e.target.value) }} />
+                                    <textarea className="form-control" rows="3" id="description" name="description" value={description} onChange={(e) => { setDescription(e.target.value) }} />
                                 </div>
                                 {/* </form> */}
                             </div>
@@ -79,7 +79,7 @@ export const Notes = () => {
                         <div className="modal-footer">
 
                             {/* lista de categorias */}
-                            <select className="form-select-padding-x-lg" aria-label="Default select example" value={category} onChange={(e) => { setCategory(e.target.value) }}>
+                            <select className="form-select-padding-x-lg" aria-label="Default select example" id="category" name="category" value={category} onChange={(e) => { setCategory(e.target.value) }}>
                                 <option defaultValue>Select category</option>
                                 <option value="Health">Health</option>
                                 <option value="Education">Education</option>
