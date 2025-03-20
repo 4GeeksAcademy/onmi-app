@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 import LandingPage from "./pages/landingpage";
@@ -29,7 +29,7 @@ const Layout = () => {
     if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
     return (
         <div>
-            <BrowserRouter basename={basename}>
+            <HashRouter basename={basename}>
                 <ScrollToTop>
                     <Navbar />
                     <Routes>
@@ -52,7 +52,7 @@ const Layout = () => {
                     </Routes>
                     <Footer />
                 </ScrollToTop>
-            </BrowserRouter>
+            </HashRouter>
         </div>
     );
 };
