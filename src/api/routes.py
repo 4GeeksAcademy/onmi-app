@@ -154,7 +154,7 @@ def login():
 
 
 @api.route("/profile", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 def user_profile():
     try:
         # Obtener el email del usuario autenticado desde el token
@@ -203,7 +203,7 @@ def verify_token():
 
 
 @api.route("/notes", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 def call_notes():
     
     current_user = get_jwt_identity()
