@@ -1,6 +1,7 @@
 .footer-logo {
   width: 50px;
   height: auto;
+  transform: scale(4);
 }
 
 .bg- {

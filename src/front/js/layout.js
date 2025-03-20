@@ -20,6 +20,7 @@ import { Footer } from "./component/footer";
 import { Pomodoro } from "./component/pomodoro";
 import HabitTracker from "./pages/habit-tracker";
 import Projects from "./pages/projects";
+import { ContactUs } from "./pages/ContactUs";
 //create your first component
 const Layout = () => {
     //the basename is used when your project is published in a subdirectory and not in the root of the domain
@@ -44,9 +45,10 @@ const Layout = () => {
                         <Route element={<Register />} path="/register" />
                         <Route element={<EditProfile />} path="/editprofile" />
                         <Route element={<Pomodoro />} path="/pomodoro" />
-                        <Route element={<HabitTracker />} path="/habits" />  
+                        <Route element={<HabitTracker />} path="/habits" />
                         <Route element={<Projects />} path="/projects" />
                         <Route element={<ResetPasswordForm />} path="/reset-password/:token" />
+                        <Route element={<ContactUs />} path="/contact" />
                     </Routes>
                     <Footer />
                 </ScrollToTop>

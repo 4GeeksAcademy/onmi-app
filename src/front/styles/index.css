@@ -93,4 +93,7 @@ html, body {
     margin-right: 55px;
   }
 
- 
+  .text-red-500 {
+    color: #f44336;
+    font-size: 0.875rem;
+}
