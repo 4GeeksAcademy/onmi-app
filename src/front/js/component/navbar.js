@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Thememode } from "./Thememode"
-import logo from "../../img/logoFinal.jpg"
+import logo from "../../img/logo-sin-fondo.jpg"
 import { Context } from "../store/appContext";
 import "../../styles/navbar.css";
 
@@ -16,7 +16,7 @@ export const Navbar = () => {
 				<Link to="/">
 					<img
 						src={logo}
-						className="navbar-brand backnavbar"
+						className="navbar-logo"
 						style={{ width: "3rem" }}
 						alt="Logo"
 					/>
