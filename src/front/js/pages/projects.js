@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import {Context} from "../store/appContext"
+import { Context } from "../store/appContext"
 import { Link } from "react-router-dom";
 import "../../styles/projects.css";
 import { Store } from "lucide-react";
-import { deleteProjects } from "../component/deleteProjets";
+// import { deleteProjects } from "../component/deleteProjets";
 
 
 
@@ -16,7 +16,7 @@ const Projects = () => {
         status: "In progress"
     });
 
-    const {store,actions} =useContext(Context)
+    const { store, actions } = useContext(Context)
 
     // Usamos useEffect para llamar a GetProjects cuando el componente se monte
     useEffect(() => {
@@ -28,7 +28,7 @@ const Projects = () => {
     };
 
     console.log(store.projects);
-    
+
     return (
         <div className="projects-container">
             <h1 className="projects-title">Projects</h1>
@@ -63,7 +63,7 @@ const Projects = () => {
                     <option value="Completed">Completed</option>
                     <option value="Inactive">Inactive</option>
                 </select>
-                <button onClick={()=>actions.PostProjects(newProject.name, newProject.urgency, newProject.category, newProject.status, newProject.dueDate)} className="projects-button">Crear Nuevo</button>
+                <button onClick={() => actions.PostProjects(newProject.name, newProject.urgency, newProject.category, newProject.status, newProject.dueDate)} className="projects-button">Crear Nuevo</button>
             </div>
             <table className="projects-table">
                 <thead>
@@ -90,9 +90,12 @@ const Projects = () => {
                                 <td>{project.date || "No date"}</td>
                                 <td>{project.category}</td>
                                 <td>
-                                    <span className={`projects-status-${project.status.toLowerCase().replace (" ", "-")}`}>
+                                    <span className={`projects-status-${project.status.toLowerCase().replace(" ", "-")}`}>
                                         {project.status}
                                     </span>
+                                </td>
+                                <td>
+                                    <button className = "border border rounded btn btn-danger " onClick={() => actions.deleteProjects(project.id)}><i class="fa-solid fa-trash"></i></button>
                                 </td>
                             </tr>
                         ))
@@ -104,7 +107,7 @@ const Projects = () => {
                 </tbody>
             </table>
             <Link to="/profile" className="projects-button">Perfil</Link>
-        </div>
+        </div >
     );
 };
 

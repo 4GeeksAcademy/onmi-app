@@ -956,7 +956,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.log("projects deleted successfully");
 
 						const store = getStore();
-						const projects = store.projects.filter(note => note.id !== id);
+						const projects = store.projects.filter(projects => projects.id !== id);
 						setStore({ projects: projects });
 						return true;
 
