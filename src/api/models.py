@@ -149,18 +149,22 @@ class Projects(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(String(1500), nullable=False)
+    Urgency: Mapped[str] = mapped_column(String(1500), nullable=False)
     category: Mapped[str] = mapped_column(String(100), nullable=True)
+    date: Mapped[str] = mapped_column(String(100), nullable=True)
+    status: Mapped[str] = mapped_column(String(100), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(back_populates="projects")
     notes: Mapped["Notes"] = relationship(back_populates="projects")
     goals: Mapped["Goals"] = relationship(back_populates="projects")
 
     def serialize(self):
-        
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description,
-            "category": self.category
+            "category": self.category,
+            "Urgency": self.Urgency,
+            "date": self.date,
+            "status": self.status,
+            
         }

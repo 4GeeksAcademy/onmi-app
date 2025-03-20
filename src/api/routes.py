@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Notes, Habits
+from api.models import db, User, Notes, Habits,Projects
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from sqlalchemy.exc import NoResultFound
@@ -734,3 +734,90 @@ def update_password():
         print(f"Error interno: {str(e)}")
         return jsonify({"msg": "Error interno", "error": str(e)}), 500
     
+
+
+
+@api.route('/projects', methods=['POST'])
+@jwt_required()
+def create_project():
+    current_user = get_jwt_identity()  
+    print("Usuario autenticado:", current_user)  # Depuración
+
+    user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one_or_none()
+    data = request.get_json()
+
+    # Verificar si todos los campos están presentes
+    required_fields = ["name", "status", "category", "urgency", "date"]
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return jsonify({"error": "Todos los campos son obligatorios"}), 400
+
+    # Proceder con la creación del proyecto si todos los campos están presentes
+    # (por ejemplo, guardar en la base de datos)
+    new_project = Projects(
+        name=data["name"],
+        status=data["status"],
+        category=data["category"],
+        user_id=user.id,
+        Urgency=data["urgency"],
+        date=data["date"]
+    )
+    db.session.add(new_project)
+    db.session.commit()
+
+    return jsonify({"message": "Proyecto creado exitosamente"}), 201
+
+
+@api.route('/projects', methods=['GET'])
+@jwt_required()
+def get_projects():
+    """Ruta protegida que devuelve los proyectos del usuario autenticado"""
+
+    current_user = get_jwt_identity()  
+    print("Usuario autenticado:", current_user)  # Depuración
+
+    user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one_or_none()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    projects = db.session.execute(
+        db.select(Projects).filter_by(user_id=user.id)
+    ).scalars().all()
+
+    print("Proyectos encontrados:", projects)  # Depuración
+
+    if not projects:
+        return jsonify({"msg": "No projects found"}), 404
+
+    return jsonify([project.serialize() for project in projects]), 200
+
+@api.route('/projects/<int:id>', methods=['DELETE'])
+@jwt_required()  # 🔒 
+def delete_projects(id):
+    
+
+    try:
+        current_user_email = get_jwt_identity()
+        user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # busca e habito en la base de dats.
+        projects = db.session.execute(db.select(Projects).filter_by(id=id)).scalar_one_or_none()
+
+        if not projects:
+            return jsonify({"error": "projects not found"}), 404
+
+        if projects.user_id != user.id:
+            return jsonify({"error": "You do not have permission to delete this projects"}), 403
+
+        # Elimina el hbit,
+        db.session.delete(projects)
+        db.session.commit()
+
+        return jsonify({"msg": "projects successfully deleted"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
