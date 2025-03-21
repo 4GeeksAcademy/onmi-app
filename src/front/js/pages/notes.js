@@ -58,7 +58,7 @@ export const Notes = () => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" id="modal2Label"> Hi Arnold!, what idea do you want to save?</h5>
+                            <h5 className="modal-title" id="modal2Label"> Hi! what idea do you want to save?</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
