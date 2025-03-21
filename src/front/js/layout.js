@@ -48,7 +48,7 @@ const Layout = () => {
                         <Route element={<HabitTracker />} path="/habits" />
                         <Route element={<Projects />} path="/projects" />
                         <Route element={<ResetPasswordForm />} path="/reset-password/:token" />
-                        <Route element={<ContactUs />} path="/contact" />
+                        <Route element={<ContactUs />} path="/contactus" />
                     </Routes>
                     <Footer />
                 </ScrollToTop>

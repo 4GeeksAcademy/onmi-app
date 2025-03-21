@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Cardnote } from "../component/cardnote";
+import "../../styles/notes.css";
 
 
 export const Notes = () => {
@@ -41,7 +42,7 @@ export const Notes = () => {
 
 
     return (
-        <div className="container" style={{ position: 'relative', minHeight: '100vh' }}>
+        <div className="container" style={{ position: 'relative', minHeight: '85vh' }}>
             <div className="container text-center mt-5">
                 <h1>Notes</h1>
                 <div className="row row-cols-1 row-cols-md-3 g-4 mt-2">
