@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Cardnote } from "../component/cardnote";
-import "../../styles/notes.css";
+
 
 
 export const Notes = () => {
