@@ -62,13 +62,15 @@ export const HabitTracker = () => {
                     />
                     <button type="submit">Add a new habit</button>
                 </form>
-                <div className="habit-list">
+                <div className="habit-list row justify-content-center">
                     {store.habitTracker.length>0?store.habitTracker.map((habit, index) => (
-                        <div key={index} className="habit-item">
-                            <h3>{habit.name}</h3>
+                        <div key={index} className="habit-item calendar-container">
+                            <div className="d-flex justify-content-between"> <h3>{habit.name}</h3>
                             <p>Category: {habit.category}</p>
                             <p>Status: <span className="status-count">{habit.count}</span></p>
-                            <Calendar
+                            </div>
+        
+                            <Calendar className="m-1 container"
                                 value={selectedDate}
                                 tileClassName={({ date, view }) => {
                                     if (habit.dates.find(d => d.toDateString() === date.toDateString())) {
@@ -81,6 +83,8 @@ export const HabitTracker = () => {
                                     }
                                 }}
                             />
+                            
+                            
                             <button onClick={() => handleIncrement(index)}>Increment</button>
                             <button onClick={() => actions.DeleteHabits(habit.id)}>Eliminar</button>
                         </div>
