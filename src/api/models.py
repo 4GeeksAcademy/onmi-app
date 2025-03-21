@@ -123,6 +123,7 @@ class HabitsTracker(db.Model):
             "success": self.success
         }
 
+
 class Goals(db.Model):
     __tablename__ = "goals"
 

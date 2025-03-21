@@ -19,6 +19,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
 
+
 load_dotenv()  # Carga las variables del archivo .env
 
 sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
@@ -402,42 +403,41 @@ def delete_habit(id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-@api.route('/user', methods=['DELETE'])
-@jwt_required()  # 🔒 Protege la ruta con JWT
-def delete_user():
+@api.route('/habits/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_habit(id):
     try:
-        # Obtener la identidad del usuario autenticado
+        # Obtener el usuario autenticado
         current_user_email = get_jwt_identity()
-
-
-        # Buscar el usuario autenticado en la base de datos
         user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
 
         if not user:
-            return jsonify({"error": "Authenticated user not found"}), 404
-
-        # Buscar el usuario que se desea eliminar
-        user_to_delete = db.session.execute(
-            db.select(User).filter_by(id=user.id)
-        ).scalar_one_or_none()
-
-        if not user_to_delete:
             return jsonify({"error": "User not found"}), 404
 
-        # Verificar si el usuario autenticado puede eliminar la cuenta
-        if user.id != user_to_delete.id:
-            return jsonify({"error": "You do not have permission to delete this user"}), 403
+        # Buscar el hábito por ID y verificar que pertenece al usuario
+        habit = db.session.execute(db.select(Habits).filter_by(id=id, user_id=user.id)).scalar_one_or_none()
 
-        # Eliminar el usuario
-        db.session.delete(user_to_delete)
+        if not habit:
+            return jsonify({"error": "Habit not found"}), 404
+
+        # Obtener los datos enviados en la solicitud
+        data = request.get_json()
+        count = data.get('count', habit.count)
+        dates = data.get('dates', habit.dates)
+
+        # Actualizar los campos del hábito
+        habit.count = count
+        habit.dates = dates
+
+        # Guardar los cambios en la base de datos
         db.session.commit()
 
-        return jsonify({"msg": "User successfully deleted"}), 200
+        return jsonify({"message": "Habit updated successfully", "habit": habit.serialize()}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 
 @api.route('/user/changepassword', methods=['PUT'])
