@@ -13,21 +13,17 @@ export const Loginview = () => {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    
+
     //console.log(email, password);
     let logged = await actions.login(email, password)
-    if (logged === false) {
+    if (logged) {
+      const userRole = localStorage.getItem("userRole"); // Obtén el rol del usuario
+      if (userRole === "Admin") {
+        navigate("/admin"); 
+      } else {
+        navigate("/profile"); 
+      }
 
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Wrong Email or Password",
-        customClass: {
-          title: "swal-custom-title",
-          confirmButton: "swal-custom-confirm-button",
-        },
-      });
-    } else {
       Swal.fire({
         title: "Logged in!",
         text: "Welcome back to ONMi!",
@@ -36,9 +32,7 @@ export const Loginview = () => {
           title: "swal-custom-title",
           confirmButton: "swal-custom-confirm-button",
         },
-
       });
-      navigate("/profile")
     }
   }
 

@@ -20,6 +20,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			],
 			notes: [],
 			updatedNote: [],
+			users: [],
 			//estado julia 
 			emotions: {
 				currentEmotion: "neutral",
@@ -42,7 +43,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			//estado compañero
 			habitTracker: [],
-			
+
 
 
 
@@ -82,22 +83,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					if (!response.ok) {
 						console.error("Error en el inicio de sesión:", result.message || "Respuesta no válida");
-						return false
-					}
-					if (!result.access_token) {
-						console.error("No se recibió un token válido:", result);
 						return false;
 					}
-					// Guardar el token solo si el backend lo envió manejo de errores
-					if (result.access_token) {
-						localStorage.setItem("token", result.access_token)
-						// Guarda el email del usuario autenticado
-						localStorage.setItem("userEmail", email); // añadidonuevo
-						setStore({ auth: true })
 
-						console.log("Usuario autenticado correctamente");
+					// Verifica si el token y el rol están presentes
+					if (result.access_token && result.user) {
+						// Guardar token y rol en localStorage
+						localStorage.setItem("token", result.access_token);
+						localStorage.setItem("userEmail", result.user.email);
+						localStorage.setItem("userRole", result.user.role);
+
+						// Almacena el estado de autenticación
+						setStore({ auth: true, userRole: result.user.role });
+
+						console.log("Usuario autenticado correctamente con rol:", result.user.role);
 
 						return true;
+					} else {
+						console.error("No se recibió un token válido o datos del usuario:", result);
+						return false;
 					}
 				} catch (error) {
 					console.error("Error durante el inicio de sesión:", error);
@@ -105,10 +109,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-
-
 			register: async (name, email, gender, password) => {
-				console.log(name, email, gender, password);
+				//console.log(name, email, gender, password);
 
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
@@ -148,29 +150,74 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			verifyToken: async () => {
-
-				let token = localStorage.getItem("token")
-				const myHeaders = new Headers();
-				myHeaders.append("Authorization", `Bearer ${token}`);
-
+				const token = localStorage.getItem("token");
+			
+				if (!token) {
+					console.error("No token found in localStorage.");
+					setStore({ auth: false });
+					return;
+				}
+			
 				const requestOptions = {
 					method: "GET",
-					headers: myHeaders,
-					redirect: "follow"
+					headers: {
+						Authorization: `Bearer ${token}`, // Incluye el token JWT
+						"Content-Type": "application/json",
+					},
+					redirect: "follow",
 				};
-
+			
 				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/verify-token", requestOptions);
-					const result = await response.json();
-					//console.log(result)
-					if (response.status !== 200) {
-						setStore({ auth: result.valid })
+					const response = await fetch(`${process.env.BACKEND_URL}/api/verify-token`, requestOptions);
+			
+					// Si la respuesta no es exitosa, maneja los errores según el código de estado
+					if (!response.ok) {
+						if (response.status === 401) {
+							console.error("Unauthorized: Token is invalid or expired.");
+						} else if (response.status === 403) {
+							console.error("Forbidden: Access denied.");
+						} else {
+							console.error(`Unexpected error: ${response.statusText}`);
+						}
+						setStore({ auth: false });
+						return;
 					}
-					setStore({ auth: result.valid })
+			
+					const result = await response.json();
+					console.log("Verify token result:", result);
+			
+					// Actualiza el estado de autenticación
+					setStore({ auth: result.valid });
 				} catch (error) {
-					console.error(error);
-				};
+					console.error("Error verifying token:", error.message || error);
+					setStore({ auth: false });
+				}
 			},
+
+			// verifyToken: async () => {
+
+			// 	let token = localStorage.getItem("token")
+			// 	const myHeaders = new Headers();
+			// 	myHeaders.append("Authorization", `Bearer ${token}`);
+
+			// 	const requestOptions = {
+			// 		method: "GET",
+			// 		headers: myHeaders,
+			// 		redirect: "follow"
+			// 	};
+
+			// 	try {
+			// 		const response = await fetch(process.env.BACKEND_URL + "/api/verify-token", requestOptions);
+			// 		const result = await response.json();
+			// 		//console.log(result)
+			// 		if (response.status !== 200) {
+			// 			setStore({ auth: result.valid })
+			// 		}
+			// 		setStore({ auth: result.valid })
+			// 	} catch (error) {
+			// 		console.error(error);
+			// 	};
+			// },
 
 			notes: async () => {
 				let token = localStorage.getItem("token")
@@ -305,37 +352,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			PostHabits: async (title, category) => {
-				console.log(title,category)
+				console.log(title, category)
 				let token = localStorage.getItem("token");
 
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
 				myHeaders.append("Authorization", `Bearer ${token}`);
-								
-				const raw = JSON.stringify({
-				  "title": title,
-				  "category": category
-				});
-				
-				const requestOptions = {
-				  method: "POST",
-				  headers: myHeaders,
-				  body: raw,
-				  redirect: "follow"
-				};
-				
-				try {
-				const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
-				const result = await response.json();
-				console.log(response)
-				if (response.status==201) {
-					getActions().getHabits()
-					
-				}
 
-				  console.log(result)
+				const raw = JSON.stringify({
+					"title": title,
+					"category": category
+				});
+
+				const requestOptions = {
+					method: "POST",
+					headers: myHeaders,
+					body: raw,
+					redirect: "follow"
+				};
+
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+					const result = await response.json();
+					console.log(response)
+					if (response.status == 201) {
+						getActions().getHabits()
+
+					}
+
+					console.log(result)
 				} catch (error) {
-				  console.error(error);
+					console.error(error);
 				};
 
 			},
@@ -348,18 +395,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 				myHeaders.append("Authorization", `Bearer ${token}`);
 
 				const requestOptions = {
-				  method: "GET",
-				  headers: myHeaders,
-				  redirect: "follow"
+					method: "GET",
+					headers: myHeaders,
+					redirect: "follow"
 				};
-				
+
 				try {
-				 const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
-				  const result = await response.json();
-				  console.log(result)
-				  setStore({habitTracker:result})
+					const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
+					const result = await response.json();
+					console.log(result)
+					setStore({ habitTracker: result })
 				} catch (error) {
-				  console.error(error);
+					console.error(error);
 				};
 
 				// const myHeaders = new Headers();
@@ -708,7 +755,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 
-			
+
 
 			createNote: async (title, description, category) => {
 				let token = localStorage.getItem("token")
@@ -845,24 +892,87 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			resetPassword: async (token, newPassword) => {
 				try {
-				  const response = await fetch(process.env.BACKEND_URL + "/api/update-password", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ token, password: newPassword })
-				  });
-			  
-				  const result = await response.json();
-				  if (!response.ok) {
-					console.error("Error:", result.msg || "Error en el servidor");
-					return false;
-				  }
-				  return true;
+					const response = await fetch(process.env.BACKEND_URL + "/api/update-password", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ token, password: newPassword })
+					});
+
+					const result = await response.json();
+					if (!response.ok) {
+						console.error("Error:", result.msg || "Error en el servidor");
+						return false;
+					}
+					return true;
 				} catch (error) {
-				  console.error("Error interno:", error);
-				  return false;
+					console.error("Error interno:", error);
+					return false;
 				}
-			  }
-			  
+			},
+
+			getUsers: async () => {
+				const token = localStorage.getItem("token");
+			
+				if (!token) {
+					console.error("No token found in localStorage.");
+					// return [];
+				}
+			
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/admin/users`, {
+						method: "GET",
+						headers: {
+							Authorization: `Bearer ${token}`, // Incluye el token JWT en los encabezados
+							"Content-Type": "application/json",
+						},
+					});
+			
+					if (response.status === 403) {
+						console.error("Access denied: You do not have permission to view this resource.");
+						return [];
+					} else if (response.status === 401) {
+						console.error("Unauthorized: Invalid or expired token.");
+						return [];
+					} else if (!response.ok) {
+						throw new Error("Failed to fetch users. Check server or network issues.");
+					}
+			
+					const data = await response.json();
+					console.log("Fetched users:", data);
+			
+					setStore({ users: data.results });
+					return data.results;
+				} catch (error) {
+					console.error("Error fetching users:", error.message || error);
+					return [];
+				}
+			},			
+
+			deleteUser: async (userId) => {
+                const token = localStorage.getItem("token");
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + `/api/admin/users/${userId}`, {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Failed to delete user");
+                    }
+
+                    const store = getStore();
+                    const updatedUsers = store.users.filter((user) => user.id !== userId);
+                    setStore({ users: updatedUsers });
+
+                    return true;
+                } catch (error) {
+                    console.error("Error deleting user:", error);
+                    return false;
+                }
+            },
+
 
 
 

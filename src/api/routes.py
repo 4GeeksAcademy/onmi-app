@@ -7,6 +7,7 @@ from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from sqlalchemy.exc import NoResultFound
 from flask_jwt_extended import verify_jwt_in_request
+from flask_jwt_extended import jwt_required, get_jwt
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from flask_cors import cross_origin
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -117,14 +118,6 @@ def login():
         if not user:
             return jsonify({"msg": "Bad password or email"}), 401
 
-        # establecer condiciones si el email que me envian desde el front es distinto envia error si no envia el token
-        # if email != user.email or check_password_hash(user.password, password):
-        #     return jsonify({"msg": "Bad password or email"}), 401
-    #     access_token = create_access_token(identity=email)
-    #     return jsonify({"access_token":access_token})
-    # except NoResultFound:
-    #     return jsonify ({"msg": "Bad password or email"}), 401
-
         if not email or not password:
             return jsonify({"msg": "Bad password or email"}), 401
 
@@ -132,11 +125,15 @@ def login():
         if not password or not check_password_hash(user.password, password):
             return jsonify({"msg": "Bad password or email"}), 401
 
-        # 3. Crear token JWT
-        access_token = create_access_token(identity=email)
+        # Crear token JWT incluyendo email y role
+        access_token = create_access_token(identity={"email": email, "role": user.role.value})
 
-        return jsonify({"access_token": access_token}), 200
-
+        return jsonify({
+        "access_token": access_token,
+        "user": {  
+        "email": email,
+        "role": user.role.value
+        }}), 200
     except Exception as e:
         return jsonify({"msg": "Error logging in", "error": str(e)}), 500
     
@@ -148,9 +145,14 @@ def login():
 
 
 
-    
-    # Protect a route with jwt_required, which will kick out requests
-# without a valid JWT present.
+
+
+
+
+
+
+
+
 
 
 @api.route("/profile", methods=["GET"])
@@ -181,14 +183,41 @@ def user_profile():
         return jsonify({"error": str(e)}), 500
 
 
+# @api.route("/verify-token", methods=["GET"])
+# def verify_token():
+#     try:
+#         verify_jwt_in_request()
+#         identify = get_jwt_identity()
+#         return jsonify({"valid": True, "user": identify}), 200
+#     except NoAuthorizationError:
+#         return jsonify({"valid": False, "message": "Token invalido o no proporcionado"})
+
 @api.route("/verify-token", methods=["GET"])
 def verify_token():
     try:
+        # Verificar si el token está presente y es válido
         verify_jwt_in_request()
-        identify = get_jwt_identity()
-        return jsonify({"valid": True, "user": identify}), 200
+        
+        # Extraer la identidad desde el token JWT
+        identity = get_jwt_identity()
+        
+        if not identity:
+            return jsonify({"valid": False, "message": "No identity found in token"}), 401
+
+        # Confirmar la estructura del token (correo y rol)
+        user_email = identity.get("email")
+        user_role = identity.get("role")
+
+        if not user_email or not user_role:
+            return jsonify({"valid": False, "message": "Invalid token structure"}), 401
+
+        return jsonify({"valid": True, "user": identity}), 200
+
     except NoAuthorizationError:
-        return jsonify({"valid": False, "message": "Token invalido o no proporcionado"})
+        return jsonify({"valid": False, "message": "Token invalido o no proporcionado"}), 401
+    except Exception as e:
+        # print(e)
+        return jsonify({"valid": False, "message": f"Unexpected error: {str(e)}"}), 500
 
 
 
@@ -734,3 +763,64 @@ def update_password():
         print(f"Error interno: {str(e)}")
         return jsonify({"msg": "Error interno", "error": str(e)}), 500
     
+
+
+
+
+
+#endpoints rutas protegidas
+
+@api.route("/admin-dashboard", methods=["GET"])
+@jwt_required()
+def admin_dashboard():
+    # Obtener el token decodificado
+    role = get_jwt()
+    user_role = role.get("role")
+
+    if user_role != "Admin":
+        return jsonify({"msg": "Access denied: Admins only"}), 403
+
+    return jsonify({"msg": "Welcome, Admin!"}), 200
+
+@api.route("/admin/users", methods=["GET"])
+@jwt_required()
+def get_users():
+    # Obtener el rol del usuario desde el token JWT
+    role = get_jwt()
+    user_role = role.get("role")
+
+    # Verificar si el usuario tiene permiso de administrador
+    if user_role != user_role.ADMIN.value:  
+        return jsonify({"msg": "Access denied: Admins only"}), 403
+
+    # Obtener todos los usuarios de la base de datos
+    try:
+        users = db.session.scalars(db.select(User)).all()
+        # Utilizar el método serialize() para estructurar los datos
+        result = [user.serialize() for user in users]
+        print(result)
+
+        return jsonify({"results": result}), 200
+    except Exception as e:
+        return jsonify({"msg": f"Error processing token: {str(e)}"}), 422
+
+@api.route("/admin/users/<int:user_id>", methods=["DELETE"])
+@jwt_required()
+def delete_user_admin(id):
+    # Obtener el rol del usuario desde el token
+    role = get_jwt()
+    user_role = role.get("role")
+
+    if user_role != "Admin":
+        return jsonify({"msg": "Access denied: Admins only"}), 403
+
+    # Buscar al usuario en la base de datos
+    user = User.query.get(id)
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    # Eliminar al usuario
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({"msg": f"User with id {id} has been deleted"}), 200

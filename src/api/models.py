@@ -40,6 +40,7 @@ class User(db.Model):
      # Campos para manejar el reseteo de contraseña
     reset_token: Mapped[str] = mapped_column(String(500), nullable=True)
     token_expiration: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    
     def set_password(self, password):
         """Establece el hash de la contraseña."""
         self.password = generate_password_hash(password)

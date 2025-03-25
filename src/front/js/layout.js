@@ -20,7 +20,10 @@ import { Footer } from "./component/footer";
 import { Pomodoro } from "./component/pomodoro";
 import HabitTracker from "./pages/habit-tracker";
 import Projects from "./pages/projects";
+import ProtectedRoute from "./component/ProtectedRoute";
+import AdminDashboard from "./pages/AdminDashboard";
 //create your first component
+
 const Layout = () => {
     //the basename is used when your project is published in a subdirectory and not in the root of the domain
     // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
@@ -33,6 +36,7 @@ const Layout = () => {
                     <Navbar />
                     <Routes>
                         {/* <Route element={<Home />} path="/" /> */}
+                        <Route path="/admin" element={<ProtectedRoute requiredRole="Admin"><AdminDashboard /></ProtectedRoute>}/>
                         <Route element={<Loginview />} path="/login" />
                         <Route element={<ResetPassword />} path="/resetpassword" />
                         <Route element={<Notes />} path="/notes" />
@@ -44,7 +48,7 @@ const Layout = () => {
                         <Route element={<Register />} path="/register" />
                         <Route element={<EditProfile />} path="/editprofile" />
                         <Route element={<Pomodoro />} path="/pomodoro" />
-                        <Route element={<HabitTracker />} path="/habits" />  
+                        <Route element={<HabitTracker />} path="/habits" />
                         <Route element={<Projects />} path="/projects" />
                         <Route element={<ResetPasswordForm />} path="/reset-password/:token" />
                     </Routes>
