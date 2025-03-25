@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Thememode } from "./Thememode"
-import logo from "../../img/logoFinal.jpg"
+import logo from "../../img/logo-sin-fondo.jpg"
 import { Context } from "../store/appContext";
 import "../../styles/navbar.css";
 
@@ -9,19 +9,14 @@ export const Navbar = () => {
 	const { store, actions } = useContext(Context);
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		
-	}, []);
-
-
-
+	
 	return (
 		<nav className="navbar navbar-light bg-light p-0">
 			<div className="container-fluid background-color margintop d-flex align-items-center">
 				<Link to="/">
 					<img
 						src={logo}
-						className="navbar-brand backnavbar"
+						className="navbar-logo"
 						style={{ width: "3rem" }}
 						alt="Logo"
 					/>
@@ -65,8 +60,8 @@ export const Navbar = () => {
 						</button>
 						<ul className="dropdown-menu  dropdown-menu-end">
 						
-							<li><button className="btn btn-light w-100 p-2  margintps marbotn" type="button">Theme</button></li>
-							<li><Link to="/editprofile"><button className=" textdecoracion btn btn-light w-100 p-2 " type="button">Edit Profile</button></Link></li>
+							{/* <li><button className="btn btn-light w-100 p-2  margintps marbotn" type="button">Theme</button></li> */}
+							<li><Link to="/editprofile"><button className=" textdecoracion btn btn-light w-100 p-2 marginthemtop " type="button">Edit Profile</button></Link></li>
 							<li><button onClick={() => {
 								localStorage.removeItem("token");
 								actions.verifyToken();

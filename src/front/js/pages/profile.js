@@ -104,11 +104,11 @@ console.log("Email guardado:", localStorage.getItem("userEmail"));
 ❓
 </button>
 <br></br>
-<div className="modal fade" id="explanation" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div className="modal fade" id="explanation" name="explanation" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div className="modal-dialog">
     <div className="modal-content">
       <div className="modal-header">
-        <h5 className="modal-title" id="staticBackdropLabel">What's Pomodoro Technique?</h5>
+        <h5 className="modal-title" id="staticBackdropLabel" name="explanation" >What's Pomodoro Technique?</h5>
         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div className="modal-body">
@@ -128,11 +128,11 @@ console.log("Email guardado:", localStorage.getItem("userEmail"));
         </button>
 
         {/* <!-- Modal --> */}
-        <div className="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div className="modal fade" id="staticBackdrop" name="explanation" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
           <div className="modal-dialog modal-fullscreen">
             <div className="modal-content">
               <div className="modal-header">
-                <h1 className="modal-title fs-5" id="staticBackdropLabel">Pomodoro Timer</h1>
+                <h1 className="modal-title fs-5" id="staticBackdropLabel" name="explanation" >Pomodoro Timer</h1>
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div className="modal-body">

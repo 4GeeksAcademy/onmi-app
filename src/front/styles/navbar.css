@@ -49,3 +49,11 @@
     color: inherit;
 }
 
+.marginthemtop{
+    margin-top: -13px;
+}
+.navbar-logo {
+    width: 50px;
+    height: auto;
+    transform: scale(3.5);
+  }

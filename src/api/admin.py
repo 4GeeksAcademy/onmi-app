@@ -20,8 +20,8 @@ class GoalsView(ModelView):
     form_columns = ('target', 'description', 'ready', 'user_id', 'projects_id')
 
 class ProjectsView(ModelView):
-    column_list = ('name', 'description', 'category', 'user_id')
-    form_columns = ('name', 'description', 'category', 'user_id')
+    column_list = ('name', 'status', 'category', 'user_id', 'Urgency','date')
+    form_columns = ('name', 'status', 'category', 'user_id','Urgency','date')
 
 
 def setup_admin(app):

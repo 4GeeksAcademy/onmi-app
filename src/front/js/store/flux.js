@@ -21,6 +21,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			notes: [],
 			updatedNote: [],
 			users: [],
+			projects: [],
 			//estado julia 
 			emotions: {
 				currentEmotion: "neutral",
@@ -430,25 +431,78 @@ const getState = ({ getStore, getActions, setStore }) => {
 				// }
 			},
 
-			DeleteHabits: async () => {
-				const myHeaders = new Headers();
-				const raw = "";
+			DeleteHabits: async (id) => {
+				let token = localStorage.getItem("token");
+			
+				if (!token) {
+					console.error("No se encontró el token en localStorage.");
+					return;
+				}
 
+				console.log("Deleting habit with ID:", id);
+
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`);
+			
 				const requestOptions = {
 					method: "DELETE",
 					headers: myHeaders,
-					body: raw,
 					redirect: "follow"
 				};
-
+			
 				try {
-					const response = await fetch(process.env.BACKEND_URL + `/api/habits/<int:id>`, requestOptions);
-					const result = await response.json();
-					console.log(result)
+					const response = await fetch(`${process.env.BACKEND_URL}/api/habits/${id}`, requestOptions);
+			
+					if (response.ok) {
+						console.log(`Habit with ID ${id} deleted successfully`);
+						const store = getStore();
+						const updatedHabits = store.habitTracker.filter(habit => habit.id !== id);
+						setStore({ habitTracker: updatedHabits });
+					} else {
+						const errorData = await response.json();
+						console.error("Error deleting habit:", errorData.message || "Unknown error");
+					}
 				} catch (error) {
-					console.error(error);
-				};
+					console.error("Error in DeleteHabits:", error);
+				}
 			},
+
+			UpdateHabit: async (id, updatedData) => {
+				let token = localStorage.getItem("token");
+			
+				if (!token) {
+					console.error("No se encontró el token en localStorage.");
+					return;
+				}
+			
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`);
+			
+				const requestOptions = {
+					method: "PUT",
+					headers: myHeaders,
+					body: JSON.stringify(updatedData),
+					redirect: "follow"
+				};
+			
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/habits/${id}`, requestOptions);
+			
+					if (response.ok) {
+						console.log(`Habit with ID ${id} updated successfully`);
+					} else {
+						const errorData = await response.json();
+						console.error("Error updating habit:", errorData.message || "Unknown error");
+					}
+				} catch (error) {
+					console.error("Error in UpdateHabit:", error);
+				}
+				},
+			
+
+			
 
 			AccountDelete: async () => {
 				let token = localStorage.getItem("token");
@@ -972,6 +1026,114 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
+			
+			PostProjects: async (name, urgency, category, status, dueDate) => {
+
+
+				let token = localStorage.getItem("token");
+
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`);
+
+				const raw = JSON.stringify({
+					"name": name,
+					"urgency": urgency,
+					"category": category,
+					"status": status,
+					"date": dueDate
+				});
+
+				const requestOptions = {
+					method: "POST",
+					headers: myHeaders,
+					body: raw,
+					redirect: "follow"
+				};
+
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/projects", requestOptions);
+					console.log(response);
+					const result = await response.json();
+					if (response.status == 201) {
+						getActions().GetProjects()
+
+						console.log("Proyecto creado:", result);  // Verifica el resultado de la respuesta
+						return result;
+					}
+				} catch (error) {
+					console.error("Error al hacer la solicitud:", error);
+					return null;
+				}
+			},
+
+			GetProjects: async () => {
+				let token = localStorage.getItem("token");
+
+
+				// Verificamos que haya un token antes de hacer la solicitud
+				if (!token) {
+					console.error("No se encontró el token en localStorage");
+					return;
+				}
+
+				const myHeaders = new Headers();
+				myHeaders.append("Content-Type", "application/json");
+				myHeaders.append("Authorization", `Bearer ${token}`);
+
+				const requestOptions = {
+					method: "GET",
+					headers: myHeaders,
+					redirect: "follow"
+				};
+
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/api/projects", requestOptions);
+					const result = await response.json();
+
+					if (response.ok) {
+						setStore({ projects: result }); // Actualiza el estado con los proyectos obtenidos
+					} else {
+						console.error("Error obteniendo proyectos:", result);
+					}
+				} catch (error) {
+					console.error("Error en la petición:", error);
+				}
+			},
+
+			deleteProjects: async (id) => {
+				let token = localStorage.getItem("token")
+				try {
+					const requestOptions = {
+						method: "DELETE",
+						headers: {
+							"Authorization": `Bearer ${token}`
+						}
+					};
+
+					const response = await fetch(`${process.env.BACKEND_URL}/api/projects/${id}`, requestOptions);
+					const result = await response.json();
+					//console.log(response);
+					//console.log(result);
+
+					if (response.ok) {
+						console.log("projects deleted successfully");
+
+						const store = getStore();
+						const projects = store.projects.filter(projects => projects.id !== id);
+						setStore({ projects: projects });
+						return true;
+
+					} else {
+						const errorData = await response.json();
+						console.error("Error deleting projects:", errorData.msg);
+						return false;
+					}
+
+				} catch (error) {
+					console.error(error);
+				};
+			},
 
 
 

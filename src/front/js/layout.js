@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 import LandingPage from "./pages/landingpage";
@@ -21,7 +21,8 @@ import { Pomodoro } from "./component/pomodoro";
 import HabitTracker from "./pages/habit-tracker";
 import Projects from "./pages/projects";
 import ProtectedRoute from "./component/ProtectedRoute";
-import AdminDashboard from "./pages/AdminDashboard";
+import { AdminDashboard } from "./pages/AdminDashboard";
+import { ContactUs } from "./pages/ContactUs";
 //create your first component
 
 const Layout = () => {
@@ -31,7 +32,7 @@ const Layout = () => {
     if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
     return (
         <div>
-            <BrowserRouter basename={basename}>
+            <HashRouter basename={basename}>
                 <ScrollToTop>
                     <Navbar />
                     <Routes>
@@ -51,10 +52,11 @@ const Layout = () => {
                         <Route element={<HabitTracker />} path="/habits" />
                         <Route element={<Projects />} path="/projects" />
                         <Route element={<ResetPasswordForm />} path="/reset-password/:token" />
+                        <Route element={<ContactUs />} path="/contactus" />
                     </Routes>
                     <Footer />
                 </ScrollToTop>
-            </BrowserRouter>
+            </HashRouter>
         </div>
     );
 };

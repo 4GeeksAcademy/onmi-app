@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Notes, Habits
+from api.models import db, User, Notes, Habits,Projects
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from sqlalchemy.exc import NoResultFound
@@ -19,6 +19,7 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
+
 
 load_dotenv()  # Carga las variables del archivo .env
 
@@ -431,42 +432,41 @@ def delete_habit(id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-@api.route('/user', methods=['DELETE'])
-@jwt_required()  # 🔒 Protege la ruta con JWT
-def delete_user():
+@api.route('/habits/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_habit(id):
     try:
-        # Obtener la identidad del usuario autenticado
+        # Obtener el usuario autenticado
         current_user_email = get_jwt_identity()
-
-
-        # Buscar el usuario autenticado en la base de datos
         user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
 
         if not user:
-            return jsonify({"error": "Authenticated user not found"}), 404
-
-        # Buscar el usuario que se desea eliminar
-        user_to_delete = db.session.execute(
-            db.select(User).filter_by(id=user.id)
-        ).scalar_one_or_none()
-
-        if not user_to_delete:
             return jsonify({"error": "User not found"}), 404
 
-        # Verificar si el usuario autenticado puede eliminar la cuenta
-        if user.id != user_to_delete.id:
-            return jsonify({"error": "You do not have permission to delete this user"}), 403
+        # Buscar el hábito por ID y verificar que pertenece al usuario
+        habit = db.session.execute(db.select(Habits).filter_by(id=id, user_id=user.id)).scalar_one_or_none()
 
-        # Eliminar el usuario
-        db.session.delete(user_to_delete)
+        if not habit:
+            return jsonify({"error": "Habit not found"}), 404
+
+        # Obtener los datos enviados en la solicitud
+        data = request.get_json()
+        count = data.get('count', habit.count)
+        dates = data.get('dates', habit.dates)
+
+        # Actualizar los campos del hábito
+        habit.count = count
+        habit.dates = dates
+
+        # Guardar los cambios en la base de datos
         db.session.commit()
 
-        return jsonify({"msg": "User successfully deleted"}), 200
+        return jsonify({"message": "Habit updated successfully", "habit": habit.serialize()}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 
 @api.route('/user/changepassword', methods=['PUT'])
@@ -732,6 +732,7 @@ def send_reset_email():
     except Exception as e:
         print(f"Error interno: {str(e)}")
         return jsonify({"msg": "Error interno", "error": str(e)}), 500
+    
 @api.route('/update-password', methods=['POST'])
 def update_password():
     try:
@@ -824,3 +825,87 @@ def delete_user_admin(id):
     db.session.commit()
 
     return jsonify({"msg": f"User with id {id} has been deleted"}), 200
+@api.route('/projects', methods=['POST'])
+@jwt_required()
+def create_project():
+    current_user = get_jwt_identity()  
+    print("Usuario autenticado:", current_user)  # Depuración
+
+    user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one_or_none()
+    data = request.get_json()
+
+    # Verificar si todos los campos están presentes
+    required_fields = ["name", "status", "category", "urgency", "date"]
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return jsonify({"error": "Todos los campos son obligatorios"}), 400
+
+    # Proceder con la creación del proyecto si todos los campos están presentes
+    # (por ejemplo, guardar en la base de datos)
+    new_project = Projects(
+        name=data["name"],
+        status=data["status"],
+        category=data["category"],
+        user_id=user.id,
+        Urgency=data["urgency"],
+        date=data["date"]
+    )
+    db.session.add(new_project)
+    db.session.commit()
+
+    return jsonify({"message": "Proyecto creado exitosamente"}), 201
+
+
+@api.route('/projects', methods=['GET'])
+@jwt_required()
+def get_projects():
+    """Ruta protegida que devuelve los proyectos del usuario autenticado"""
+
+    current_user = get_jwt_identity()  
+    print("Usuario autenticado:", current_user)  # Depuración
+
+    user = db.session.execute(db.select(User).filter_by(email=current_user)).scalar_one_or_none()
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+
+    projects = db.session.execute(
+        db.select(Projects).filter_by(user_id=user.id)
+    ).scalars().all()
+
+    print("Proyectos encontrados:", projects)  # Depuración
+
+    if not projects:
+        return jsonify({"msg": "No projects found"}), 404
+
+    return jsonify([project.serialize() for project in projects]), 200
+
+@api.route('/projects/<int:id>', methods=['DELETE'])
+@jwt_required()  # 🔒 
+def delete_projects(id):
+    
+
+    try:
+        current_user_email = get_jwt_identity()
+        user = db.session.execute(db.select(User).filter_by(email=current_user_email)).scalar_one_or_none()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # busca e habito en la base de dats.
+        projects = db.session.execute(db.select(Projects).filter_by(id=id)).scalar_one_or_none()
+
+        if not projects:
+            return jsonify({"error": "projects not found"}), 404
+
+        if projects.user_id != user.id:
+            return jsonify({"error": "You do not have permission to delete this projects"}), 403
+
+        # Elimina el hbit,
+        db.session.delete(projects)
+        db.session.commit()
+
+        return jsonify({"msg": "projects successfully deleted"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -16,7 +16,8 @@ export const Register = () => {
     gender: '',
   });
   
-  const navigate = useNavigate();
+const navigate = useNavigate();
+const [passwordError, setPasswordError] = useState(""); // estado error pw 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,8 +25,18 @@ export const Register = () => {
       ...prevState,
       [name]: value
     }));
+
+     if (name==="password") {
+       if (!validatePassword(value)) 
+        {setPasswordError("Password must contain at least 8 characters and a Number."); } 
+     else {
+      setPasswordError("");
+     }
+     }
   };
 
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Add signup logic here
@@ -41,7 +52,19 @@ export const Register = () => {
       });
       return;
     }
-
+  // Validar la fortaleza de la contraseña
+  if (!validatePassword(formData.password)) {
+    Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Password must contain at least 8 characters and a Number.",
+        customClass: {
+            title: "swal-custom-title",
+            confirmButton: "swal-custom-confirm-button",
+        },
+    });
+    return;
+}
     const userCreated = await actions.register(formData.name, formData.email, formData.gender, formData.password );
 
     if (!userCreated) {
@@ -69,20 +92,33 @@ export const Register = () => {
     }
   };
 
+   const validatePassword = (password) => {
+     const minLength= 8;
+     const hasNumber= /\d/; //se usa como exp para los num
+  
+     return password.length >= minLength && hasNumber.test(password);
+
+ };
+
   console.log('Signup data:', formData);
+
 
   return (
     <div className="mx-auto my-5">
-      <div className="container">
+      <div className="container justify-center justify-between  align-center">
         {/* Left Side - Description */}
         <div className="">
           <h1 className="">Become a member</h1>
           <p className="">
-            Onmino helps you organize your ideas, tasks, and projects simply and efficiently. Start today!
+            ONMi helps you organize your ideas, tasks, and projects simply and efficiently. 
+            <br></br>
+            <br></br>
+            <b>Start today!</b>
+            
           </p>
         </div>
         {/* Right Side - Signup Form */}
-        <div className="w-1/2 p-8 bg-white">
+        <div className="ml-5 w-1/2 p-8 bg-white">
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <input
@@ -123,6 +159,7 @@ export const Register = () => {
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
+              {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>} 
             </div>
             <div className="mb-4 relative">
               <input

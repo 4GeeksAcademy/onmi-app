@@ -23,16 +23,20 @@ export const HabitTracker = () => {
     };
 
     const handleIncrement = (index) => {
-        const newHabits = [...habits];
+        const newHabits = [...store.habitTracker];
         newHabits[index].count += 1;
         newHabits[index].dates.push(new Date());
+    
+        // Actualiza el estado local
         setHabits(newHabits);
+    
+        // Llama a la acción para actualizar el hábito en el backend
+        actions.UpdateHabit(habit.id, {
+            count: habit.count,
+            dates: habit.dates
+        });
     };
 
-    const handleDelete = (index) => {
-        const newHabits = habits.filter((_, i) => i !== index);
-        setHabits(newHabits);
-    };
     useEffect(()=>{
         actions.getHabits()
     },[])
@@ -58,13 +62,15 @@ export const HabitTracker = () => {
                     />
                     <button type="submit">Add a new habit</button>
                 </form>
-                <div className="habit-list">
+                <div className="habit-list row justify-content-center">
                     {store.habitTracker.length>0?store.habitTracker.map((habit, index) => (
-                        <div key={index} className="habit-item">
-                            <h3>{habit.name}</h3>
+                        <div key={index} className="habit-item calendar-container">
+                            <div className="d-flex justify-content-between"> <h3>{habit.name}</h3>
                             <p>Category: {habit.category}</p>
                             <p>Status: <span className="status-count">{habit.count}</span></p>
-                            <Calendar
+                            </div>
+        
+                            <Calendar className="m-1 container"
                                 value={selectedDate}
                                 tileClassName={({ date, view }) => {
                                     if (habit.dates.find(d => d.toDateString() === date.toDateString())) {
@@ -77,8 +83,10 @@ export const HabitTracker = () => {
                                     }
                                 }}
                             />
+                            
+                            
                             <button onClick={() => handleIncrement(index)}>Increment</button>
-                            <button onClick={() => handleDelete(index)}>Delete</button>
+                            <button onClick={() => actions.DeleteHabits(habit.id)}>Eliminar</button>
                         </div>
                     )):null}
                 </div>
