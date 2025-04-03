@@ -42,7 +42,7 @@ export const HabitTracker = () => {
     },[])
     console.log(store.habitTracker)
     return (
-        <div className="habit-tracker-container habit-tracker">
+        <div className="container habit-tracker">
             <main>
                 <h1>Habit - Tracker</h1>
                 <form className="habit-form" onSubmit={handleAddHabit}>

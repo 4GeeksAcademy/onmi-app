@@ -6,7 +6,7 @@ import '../../styles/footer.css';
 
 export const Footer = () => {
   return (
-    <footer className="bg- text-white py-4 px-6 flex items-center justify-between">
+    <footer className="position-fixed bottom-0 w-100 bg- text-white py-3 px-6 flex items-center justify-between">
       <div className="flex items-center space-x-4">
         <div className="footer-logo-container">
           <img src={logo} alt="ONMi Logo" className="footer-logo" />

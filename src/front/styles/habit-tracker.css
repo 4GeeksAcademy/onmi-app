@@ -1,10 +1,11 @@
 .habit-tracker-container {
     font-family: Arial, sans-serif;
     padding: 20px;
+    margin: 20px;
 }
 
 .habit-tracker main {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     text-align: center;
 }

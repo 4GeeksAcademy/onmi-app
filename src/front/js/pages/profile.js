@@ -81,7 +81,7 @@ console.log("Email guardado:", localStorage.getItem("userEmail"));
           </p>
         </div>
       </div>
-      <div className="container mt-5 " id="middle" style={{ position: "relative", justifyContent: "center", alignItems: 'center', textAlign: "center" }}>
+      <div className="container" id="middle" style={{ position: "relative", justifyContent: "center", alignItems: 'center', textAlign: "center" }}>
         <h1> <b>How are you feeling today?</b></h1>
 
         {/* <Avatars gender={store.userGender} emotion={selectedEmotion} setEmotion={setSelectedEmotion} /> */}

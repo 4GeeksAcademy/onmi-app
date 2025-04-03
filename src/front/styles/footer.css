@@ -57,3 +57,6 @@
 .justify-between {
   justify-content: space-between;
 }
+.main-content {
+  margin-bottom: 4rem; /* Ajusta esto para que coincida con el alto del footer */
+}
