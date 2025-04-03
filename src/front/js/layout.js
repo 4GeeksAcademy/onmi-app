@@ -21,7 +21,7 @@ import { Pomodoro } from "./component/pomodoro";
 import HabitTracker from "./pages/habit-tracker";
 import Projects from "./pages/projects";
 import ProtectedRoute from "./component/ProtectedRoute";
-import { AdminDashboard } from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import { ContactUs } from "./pages/ContactUs";
 //create your first component
 

@@ -8,7 +8,7 @@ export const EmotionCounter = ({ emotion }) => {
 
   return (
     <div className="emotions-counter">
-    <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <button type="button" className="btn btn-primary mb-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
     Check my progress
    </button>
    <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

@@ -42,17 +42,18 @@ export const Notes = () => {
 
 
     return (
-        <div className="container" style={{ position: 'relative', minHeight: '85vh' }}>
-            <div className="container text-center mt-5">
+        <div className="container mb-5" style={{ position: 'relative', minHeight: '85vh' }}>
+            <div className="container text-center my-5">
                 <h1>Notes</h1>
+                <div className="d-flex justify-content-center">
+                    <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal2">New note</button>
+                </div>
                 <div className="row row-cols-1 row-cols-md-3 g-4 mt-2">
                     {note.length > 0 ? note.map((item) => <Cardnote key={item.id} id={item.id} title={item.title} description={item.description} category={item.category} />) : null}
                 </div>
             </div>
 
-            <div className="fixed-bottom d-flex justify-content-end p-4">
-                <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal2">New note</button>
-            </div>
+
 
             <form onSubmit={handleSubmit} className="modal" id="modal2" tabIndex="-1" aria-labelledby="modal2Label" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-centered">

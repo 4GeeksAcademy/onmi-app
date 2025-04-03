@@ -49,6 +49,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 
+
 		},
 		actions: {
 
@@ -59,59 +60,61 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			login: async (email, password) => {
-
-				//console.log(email, password);
-				const myHeaders = new Headers();
-				myHeaders.append("Content-Type", "application/json");
-
-				const raw = JSON.stringify({
-					"email": email,
-					"password": password
-				});
-
-				const requestOptions = {
-					method: "POST",
-					headers: myHeaders,
-					body: raw
-				};
-
 				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/login", requestOptions);
+					// Configuración de encabezados y cuerpo de la solicitud
+					const myHeaders = new Headers();
+					myHeaders.append("Content-Type", "application/json");
+
+					const raw = JSON.stringify({
+						email: email,
+						password: password
+					});
+
+					const requestOptions = {
+						method: "POST",
+						headers: myHeaders,
+						body: raw,
+					};
+
+					// Realizar la solicitud al endpoint de login
+					const response = await fetch(`${process.env.BACKEND_URL}/api/login`, requestOptions);
 					const result = await response.json();
-					console.log(response);
 
-					console.log(result)
-
+					// Verificar el código de respuesta HTTP
 					if (!response.ok) {
-						console.error("Error en el inicio de sesión:", result.message || "Respuesta no válida");
-						return false;
+						console.error("Error en el inicio de sesión:", result.msg || "Error desconocido");
+						return { success: false, message: result.msg || "Error en el servidor" };
 					}
 
-					// Verifica si el token y el rol están presentes
+					// Verificar que el token JWT y los datos del usuario estén presentes
 					if (result.access_token && result.user) {
-						// Guardar token y rol en localStorage
+						// Guardar el token y la información del usuario en localStorage
 						localStorage.setItem("token", result.access_token);
 						localStorage.setItem("userEmail", result.user.email);
 						localStorage.setItem("userRole", result.user.role);
 
-						// Almacena el estado de autenticación
-						setStore({ auth: true, userRole: result.user.role });
+						// Actualizar el estado global con la información de autenticación
+						setStore({
+							auth: true,
+							userRole: result.user.role,
+							userEmail: result.user.email,
+						});
 
 						console.log("Usuario autenticado correctamente con rol:", result.user.role);
 
-						return true;
+						return { success: true, message: "Inicio de sesión exitoso" };
 					} else {
 						console.error("No se recibió un token válido o datos del usuario:", result);
-						return false;
+						return { success: false, message: "Error en el formato de la respuesta del servidor" };
 					}
 				} catch (error) {
-					console.error("Error durante el inicio de sesión:", error);
-					return false;
+					console.error("Error durante el inicio de sesión:", error.message || error);
+					return { success: false, message: "Error de red o conexión al servidor" };
 				}
 			},
 
+
 			register: async (name, email, gender, password) => {
-				//console.log(name, email, gender, password);
 
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
@@ -131,34 +134,40 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 
 				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/register", requestOptions);
+					const response = await fetch(`${process.env.BACKEND_URL}/api/register`, requestOptions);
 					const result = await response.json();
-					console.log(result)
-					// Guardar el token solo si el backend lo envió
-					if (result.access_token) {
+					//console.log(result);
+
+					if (response.ok && result.access_token) {
+
 						localStorage.setItem("token", result.access_token);
-						localStorage.setItem("userEmail", email);
-						return true
+						localStorage.setItem("userEmail", result.user.email);
+						localStorage.setItem("userRole", result.user.role);
+
+						//console.log("Usuario registrado con éxito:", result.user);
+						return { success: true, message: "User registered successfully" };
 					} else {
-						console.warn("El servidor no devolvió un token.");
+						//console.warn("Error durante el registro:", result.msg || "Unknown error");
+						return { success: false, message: result.msg || "Failed to register user" };
 					}
 
-					return false;
-
 				} catch (error) {
-					console.error(error);
-				};
+					console.error("Error al realizar la solicitud de registro:", error);
+					return { success: false, message: "An error occurred during registration" };
+				}
 			},
+
 
 			verifyToken: async () => {
 				const token = localStorage.getItem("token");
-			
+
+				// Validar si el token existe en localStorage
 				if (!token) {
 					console.error("No token found in localStorage.");
-					setStore({ auth: false });
-					return;
+					setStore({ auth: false, userRole: null, userEmail: null });
+					return { success: false, message: "No token found in localStorage" };
 				}
-			
+
 				const requestOptions = {
 					method: "GET",
 					headers: {
@@ -167,11 +176,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					},
 					redirect: "follow",
 				};
-			
+
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/verify-token`, requestOptions);
-			
-					// Si la respuesta no es exitosa, maneja los errores según el código de estado
+
+					// Verifica si la respuesta HTTP no es exitosa
 					if (!response.ok) {
 						if (response.status === 401) {
 							console.error("Unauthorized: Token is invalid or expired.");
@@ -180,72 +189,71 @@ const getState = ({ getStore, getActions, setStore }) => {
 						} else {
 							console.error(`Unexpected error: ${response.statusText}`);
 						}
-						setStore({ auth: false });
-						return;
+						setStore({ auth: false, userRole: null, userEmail: null });
+						return { success: false, message: "Token is invalid or expired" };
 					}
-			
+
 					const result = await response.json();
 					console.log("Verify token result:", result);
-			
-					// Actualiza el estado de autenticación
-					setStore({ auth: result.valid });
+
+					// Validación de datos del usuario en la respuesta
+					if (result.valid && result.user) {
+						const { email, role } = result.user;
+
+						// Guardar información en el estado global
+						setStore({
+							auth: true,
+							userRole: role,
+							userEmail: email,
+						});
+
+						return { success: true, message: "Token is valid", role, email };
+					} else {
+						console.error("Invalid token structure or missing user data:", result);
+						setStore({ auth: false, userRole: null, userEmail: null });
+						return { success: false, message: "Invalid token structure or missing user data" };
+					}
 				} catch (error) {
 					console.error("Error verifying token:", error.message || error);
-					setStore({ auth: false });
+					setStore({ auth: false, userRole: null, userEmail: null });
+					return { success: false, message: "Error verifying token" };
 				}
 			},
 
-			// verifyToken: async () => {
-
-			// 	let token = localStorage.getItem("token")
-			// 	const myHeaders = new Headers();
-			// 	myHeaders.append("Authorization", `Bearer ${token}`);
-
-			// 	const requestOptions = {
-			// 		method: "GET",
-			// 		headers: myHeaders,
-			// 		redirect: "follow"
-			// 	};
-
-			// 	try {
-			// 		const response = await fetch(process.env.BACKEND_URL + "/api/verify-token", requestOptions);
-			// 		const result = await response.json();
-			// 		//console.log(result)
-			// 		if (response.status !== 200) {
-			// 			setStore({ auth: result.valid })
-			// 		}
-			// 		setStore({ auth: result.valid })
-			// 	} catch (error) {
-			// 		console.error(error);
-			// 	};
-			// },
 
 			notes: async () => {
-				let token = localStorage.getItem("token")
+
+				let token = localStorage.getItem("token");
 				try {
 					const requestOptions = {
 						method: "GET",
 						headers: {
-							"Authorization": `Bearer ${token}`
-						}
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${token}`,
+						},
 					};
 
 					const response = await fetch(process.env.BACKEND_URL + "/api/notes", requestOptions);
+
+					if (!response.ok) {
+						if (response.status === 403) {
+							throw new Error("Access denied: You do not have the required role.");
+						}
+						throw new Error(`Error: ${response.statusText}`);
+					}
+
 					const result = await response.json();
-					//console.log(response);
 
-					setStore({ notes: result.resul })
-					//setStore({ message: data.message })
+					// Validar el rol del usuario
+					if (result.role && result.role !== "User") {
+						throw new Error("Access denied: Insufficient permissions.");
+					}
+
+					setStore({ notes: result.resul });
 				} catch (error) {
-					console.error(error);
-				};
-
+					console.error(error.message);
+				}
 			},
-
-
-
-
-
 
 
 			getMessage: async () => {
@@ -297,60 +305,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log(`Completed sessions: ${store.completedCycles}`);
 
 			},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 			PostHabits: async (title, category) => {
 				console.log(title, category)
@@ -409,31 +363,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error(error);
 				};
-
-				// const myHeaders = new Headers();
-				// myHeaders.append("Content-Type", "application/json");
-
-				// const requestOptions = {
-				// 	method: "GET",
-				// 	headers: myHeaders,
-				// 	redirect: "follow"
-				// };
-
-				// try {
-				// 	const response = await fetch(process.env.BACKEND_URL + "/api/habits", requestOptions);
-				// 	if (!response.ok) {
-				// 		throw new Error(`HTTP error! status: ${response.status}`);
-				// 	}
-				// 	const result = await response.json();
-				// 	console.log(result);
-				// } catch (error) {
-				// 	console.error("Error fetching habits:", error); // Manejo de errores si falla la solicitud
-				// }
 			},
 
 			DeleteHabits: async (id) => {
 				let token = localStorage.getItem("token");
-			
+
 				if (!token) {
 					console.error("No se encontró el token en localStorage.");
 					return;
@@ -444,16 +378,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
 				myHeaders.append("Authorization", `Bearer ${token}`);
-			
+
 				const requestOptions = {
 					method: "DELETE",
 					headers: myHeaders,
 					redirect: "follow"
 				};
-			
+
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/habits/${id}`, requestOptions);
-			
+
 					if (response.ok) {
 						console.log(`Habit with ID ${id} deleted successfully`);
 						const store = getStore();
@@ -470,26 +404,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			UpdateHabit: async (id, updatedData) => {
 				let token = localStorage.getItem("token");
-			
+
 				if (!token) {
 					console.error("No se encontró el token en localStorage.");
 					return;
 				}
-			
+
 				const myHeaders = new Headers();
 				myHeaders.append("Content-Type", "application/json");
 				myHeaders.append("Authorization", `Bearer ${token}`);
-			
+
 				const requestOptions = {
 					method: "PUT",
 					headers: myHeaders,
 					body: JSON.stringify(updatedData),
 					redirect: "follow"
 				};
-			
+
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/habits/${id}`, requestOptions);
-			
+
 					if (response.ok) {
 						console.log(`Habit with ID ${id} updated successfully`);
 					} else {
@@ -499,166 +433,51 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error in UpdateHabit:", error);
 				}
-				},
-			
-
-			
-
-			AccountDelete: async () => {
-				let token = localStorage.getItem("token");
-
-				const myHeaders = new Headers();
-				myHeaders.append("Authorization", `Bearer ${token}`);
-
-				const requestOptions = {
-					method: "DELETE",
-					headers: myHeaders,
-					redirect: "follow"
-				};
-
-				try {
-					const response = await fetch(process.env.BACKEND_URL + `/api/user/`, requestOptions);
-
-					if (response.ok) {
-						// Eliminar el token del localStorage
-						localStorage.removeItem("token");
-
-						// Redirigir al landing page
-						window.location.href = "/";
-					} else {
-						console.error("Error al eliminar la cuenta");
-					}
-				} catch (error) {
-					console.error("Error en la solicitud:", error);
-				}
 			},
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			AccountDelete: async () => {
+				const token = localStorage.getItem("token");
+			
+				if (!token) {
+					console.warn("No se encontró un token en el localStorage.");
+					return { success: false, message: "No authentication token found." };
+				}
+			
+				const myHeaders = new Headers();
+				myHeaders.append("Authorization", `Bearer ${token}`);
+			
+				const requestOptions = {
+					method: "DELETE",
+					headers: myHeaders,
+					redirect: "follow"
+				};
+			
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, requestOptions);
+			
+					if (response.ok) {
+						localStorage.removeItem("token");
+						localStorage.removeItem("userEmail");
+						localStorage.removeItem("userRole");
+			
+						window.location.href = "/";
+						console.log("Cuenta eliminada con éxito.");
+						return { success: true, message: "Account deleted successfully." };
+					} else {
+						const errorData = await response.json();
+						console.error("Error al eliminar la cuenta:", errorData.msg || "Unknown error.");
+						return { success: false, message: errorData.msg || "Failed to delete account." };
+					}
+				} catch (error) {
+					
+					console.error("Error en la solicitud:", error);
+					return { success: false, message: "An error occurred while trying to delete the account." };
+				}
+			},
+			
 
 
 			getProfile: async () => {
@@ -729,8 +548,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			},
-
-
 
 			getGender: () => {
 				fetch(process.env.BACKEND_URL + "/api/user/me", {
@@ -966,21 +783,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			getUsers: async () => {
 				const token = localStorage.getItem("token");
-			
+
 				if (!token) {
 					console.error("No token found in localStorage.");
-					// return [];
+					return [];
 				}
-			
+
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/admin/users`, {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/admin-users`, {
 						method: "GET",
 						headers: {
-							Authorization: `Bearer ${token}`, // Incluye el token JWT en los encabezados
+							Authorization: `Bearer ${token}`, // Corregido
 							"Content-Type": "application/json",
 						},
 					});
-			
+
 					if (response.status === 403) {
 						console.error("Access denied: You do not have permission to view this resource.");
 						return [];
@@ -988,45 +805,65 @@ const getState = ({ getStore, getActions, setStore }) => {
 						console.error("Unauthorized: Invalid or expired token.");
 						return [];
 					} else if (!response.ok) {
-						throw new Error("Failed to fetch users. Check server or network issues.");
+						throw new Error(`Failed to fetch users. Status: ${response.status}`);
 					}
-			
+
 					const data = await response.json();
-					console.log("Fetched users:", data);
-			
+					//console.log("Fetched users:", data.results);
+
 					setStore({ users: data.results });
 					return data.results;
 				} catch (error) {
 					console.error("Error fetching users:", error.message || error);
 					return [];
 				}
-			},			
+			},
 
 			deleteUser: async (userId) => {
-                const token = localStorage.getItem("token");
-                try {
-                    const response = await fetch(process.env.BACKEND_URL + `/api/admin/users/${userId}`, {
-                        method: "DELETE",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
+				try {
+					// Obtener el token desde localStorage
+					const token = localStorage.getItem("token");
 
-                    if (!response.ok) {
-                        throw new Error("Failed to delete user");
-                    }
+					// Verificar si el token está presente
+					if (!token) {
+						console.error("No se encontró el token de autenticación.");
+						return { success: false, message: "No token found in localStorage" };
+					}
 
-                    const store = getStore();
-                    const updatedUsers = store.users.filter((user) => user.id !== userId);
-                    setStore({ users: updatedUsers });
+					// Realizar la solicitud al endpoint
+					const response = await fetch(`${process.env.BACKEND_URL}/api/admin/users/${userId}`, {
+						method: "DELETE",
+						headers: {
+							Authorization: `Bearer ${token}`,
+							"Content-Type": "application/json",
+						},
+					});
 
-                    return true;
-                } catch (error) {
-                    console.error("Error deleting user:", error);
-                    return false;
-                }
-            },
-			
+					// Manejo de errores HTTP
+					if (response.status === 403) {
+						console.error("Access denied: No permissions to delete users.");
+						return { success: false, message: "Access denied: Admins only" };
+					} else if (response.status === 404) {
+						console.error("User not found.");
+						return { success: false, message: "User not found" };
+					} else if (!response.ok) {
+						throw new Error(`Failed to delete user. Status: ${response.status}`);
+					}
+
+					// Actualizar el estado global al eliminar al usuario
+					const store = getStore();
+					const updatedUsers = store.users.filter((user) => user.id !== userId);
+					setStore({ users: updatedUsers });
+
+					console.log(`User with ID ${userId} has been successfully deleted.`);
+					return { success: true, message: `User with ID ${userId} deleted successfully` };
+				} catch (error) {
+					console.error("Error deleting user:", error.message || error);
+					return { success: false, message: "An error occurred while deleting the user" };
+				}
+			},
+
+
 			PostProjects: async (name, urgency, category, status, dueDate) => {
 
 
@@ -1134,11 +971,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error(error);
 				};
 			},
-
-
-
-
-
 
 
 		},

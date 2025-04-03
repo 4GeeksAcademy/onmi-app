@@ -19,6 +19,9 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
+from sqlalchemy.exc import SQLAlchemyError
+
+
 
 
 load_dotenv()  # Carga las variables del archivo .env
@@ -67,93 +70,82 @@ def get_one_user(id):
 @api.route('/register', methods=['POST'])
 def create_user():
     try:
+
         request_body = request.json
-        email = request_body["email"]
-        password = request_body["password"]  
-        name = request_body["name"]
-        gender = request_body["gender"]
+        email = request_body.get("email")
+        password = request_body.get("password")
+        name = request_body.get("name")
+        gender = request_body.get("gender")
 
-        if not email or not password or not name:
-            return jsonify({"msg": "missing data"}), 400 
+        if not email or not password or not name or not gender:
+            return jsonify({"msg": "Missing data"}), 400
 
-        # 1. Verificar si el usuario ya existe
         existing_user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
         if existing_user:
             return jsonify({"msg": "User already exists"}), 400
 
-        # 2. Encriptar contraseña
         hashed_password = generate_password_hash(password)
 
-        # 3. Crear nuevo usuario
         new_user = User(
-            name=request_body["name"],
-            
-            email=request_body["email"],
-            gender=request_body["gender"],
+            name=name,
+            email=email,
+            gender=gender,
             password=hashed_password,
             is_active=True,
-            role= "USER"
-            
+            role="USER"
         )
 
         db.session.add(new_user)
         db.session.commit()
 
-        # 4. Generar token JWT
-        access_token = create_access_token(identity=email)
+        access_token = create_access_token(
+            identity=email,
+            additional_claims={"role": new_user.role}  
+        )
 
-        return jsonify({"msg": "User created", "access_token": access_token}), 201
+        # Respuesta de éxito
+        return jsonify({
+            "msg": "User created",
+            "access_token": access_token,
+            "user": {
+                "email": new_user.email,
+                "role": new_user.role
+            }
+        }), 201
 
     except Exception as e:
+        # Manejo de errores inesperados
         return jsonify({"msg": "Error creating user", "error": str(e)}), 500
+
 
 @api.route("/login", methods=["POST"])
 def login():
     try:
-        #     # OBTIENE INFO CUERPO PETICION
         email = request.json.get("email", None)
         password = request.json.get("password", None)
 
-        # 1 registro de tabla específica
-        user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
-        if not user:
-            return jsonify({"msg": "Bad password or email"}), 401
-
         if not email or not password:
-            return jsonify({"msg": "Bad password or email"}), 401
+            return jsonify({"msg": "Email and password are required."}), 400
 
-        # 2. Verificar la contraseña encriptada
-        if not password or not check_password_hash(user.password, password):
-            return jsonify({"msg": "Bad password or email"}), 401
+        user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
+        if not user or not check_password_hash(user.password, password):
+            return jsonify({"msg": "Invalid email or password."}), 401
 
-        # Crear token JWT incluyendo email y role
-        access_token = create_access_token(identity={"email": email, "role": user.role.value})
+        access_token = create_access_token(
+            identity=email,
+            additional_claims={"role": user.role.value}
+        )
 
         return jsonify({
-        "access_token": access_token,
-        "user": {  
-        "email": email,
-        "role": user.role.value
-        }}), 200
+            "msg": "Login successful.",
+            "access_token": access_token,
+            "user": {
+                "email": user.email,
+                "role": user.role.value
+            }
+        }), 200
     except Exception as e:
-        return jsonify({"msg": "Error logging in", "error": str(e)}), 500
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return jsonify({"msg": "An error occurred during login.", "error": str(e)}), 500
 
 
 @api.route("/profile", methods=["GET"])
@@ -184,52 +176,41 @@ def user_profile():
         return jsonify({"error": str(e)}), 500
 
 
-# @api.route("/verify-token", methods=["GET"])
-# def verify_token():
-#     try:
-#         verify_jwt_in_request()
-#         identify = get_jwt_identity()
-#         return jsonify({"valid": True, "user": identify}), 200
-#     except NoAuthorizationError:
-#         return jsonify({"valid": False, "message": "Token invalido o no proporcionado"})
-
 @api.route("/verify-token", methods=["GET"])
+@jwt_required()
 def verify_token():
+    """
+    Verifica la validez del token JWT y retorna la identidad del usuario.
+    """
     try:
-        # Verificar si el token está presente y es válido
+        # Verificar si el token está presente y válido
         verify_jwt_in_request()
-        
-        # Extraer la identidad desde el token JWT
-        identity = get_jwt_identity()
-        
+
+        # Extraer la identidad del token JWT
+        identity = get_jwt_identity()  # Esto debería ser el email (identity) definido en /login
+        claims = get_jwt()  # Extraer los claims adicionales (como role)
+
         if not identity:
             return jsonify({"valid": False, "message": "No identity found in token"}), 401
 
-        # Confirmar la estructura del token (correo y rol)
-        user_email = identity.get("email")
-        user_role = identity.get("role")
+        # Confirmar la estructura y validez del token (identity y role)
+        user_role = claims.get("role")
+        if not user_role:
+            return jsonify({"valid": False, "message": "Invalid token structure: Missing role"}), 401
 
-        if not user_email or not user_role:
-            return jsonify({"valid": False, "message": "Invalid token structure"}), 401
-
-        return jsonify({"valid": True, "user": identity}), 200
+        # Respuesta exitosa con los datos del usuario
+        return jsonify({
+            "valid": True,
+            "user": {
+                "email": identity,  # El email es el identity principal del token
+                "role": user_role
+            }
+        }), 200
 
     except NoAuthorizationError:
         return jsonify({"valid": False, "message": "Token invalido o no proporcionado"}), 401
     except Exception as e:
-        # print(e)
         return jsonify({"valid": False, "message": f"Unexpected error: {str(e)}"}), 500
-
-
-
-
-
-
-
-
-
-
-
 
 
 @api.route("/notes", methods=["GET"])
@@ -248,84 +229,6 @@ def call_notes():
 
 
     return jsonify({"resul": list_notes}), 200
-
-
-# @app.route("/protected", methods=["GET"])
-# @jwt_required()
-# def protected():
-#     # Access the identity of the current user with get_jwt_identity
-#     current_user = get_jwt_identity()
-#     return jsonify(logged_in_as=current_user), 200
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Funcional
 @api.route("/habits", methods=["POST"])
@@ -372,8 +275,6 @@ def create_habit():
         return jsonify({"error": str(e)}), 500
 
 
-
-
 # Funcional
 @api.route('/habits', methods=['GET'])
 @jwt_required()
@@ -400,7 +301,6 @@ def handle_get_habits():
     list_habits = [habit.serialize() for habit in habits]
 
     return jsonify(list_habits), 200  # Devuelve solo los hábitos del usuario autenticado
-
 
 
 @api.route('/habits/<int:id>', methods=['DELETE'])
@@ -432,6 +332,7 @@ def delete_habit(id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
 @api.route('/habits/<int:id>', methods=['PUT'])
 @jwt_required()
 def update_habit(id):
@@ -467,8 +368,6 @@ def update_habit(id):
         return jsonify({"error": str(e)}), 500
 
 
-
-
 @api.route('/user/changepassword', methods=['PUT'])
 @jwt_required()
 def change_password():
@@ -496,9 +395,6 @@ def change_password():
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-
-
-
 @api.route('/user/me', methods=['GET'])
 @jwt_required()
 def get_logged_in_user():
@@ -516,78 +412,7 @@ def get_logged_in_user():
         # Registrar el error en los logs del servidor
         print(f"Error en /user/me: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 #Crear una nota LISTO
 @api.route('/notes', methods=['POST'])
 @jwt_required()
@@ -620,8 +445,6 @@ def create_note():
     except Exception as e: 
         #print(e)
         return jsonify({"msg":"Not ok"}), 500
-        
-
 
  
 @api.route('/notes/<int:id>', methods=['PUT'])
@@ -684,7 +507,6 @@ def delete_note(id):
        
         return jsonify({"msg":"Note does not exist"}), 404
     
-
 
 @api.route('/reset-password', methods=['POST'])
 def send_reset_email():
@@ -765,66 +587,77 @@ def update_password():
         return jsonify({"msg": "Error interno", "error": str(e)}), 500
     
 
-
-
-
-
 #endpoints rutas protegidas
 
 @api.route("/admin-dashboard", methods=["GET"])
 @jwt_required()
 def admin_dashboard():
-    # Obtener el token decodificado
-    role = get_jwt()
-    user_role = role.get("role")
+    
+    try:
+        
+        identity = get_jwt_identity() 
+        user_role = identity.get("role")  
 
-    if user_role != "Admin":
-        return jsonify({"msg": "Access denied: Admins only"}), 403
+        if user_role != "Admin":
+            return jsonify({"msg": "Access denied: Admins only"}), 403
 
-    return jsonify({"msg": "Welcome, Admin!"}), 200
+        return jsonify({"msg": "Welcome, Admin!"}), 200
 
-@api.route("/admin/users", methods=["GET"])
+    except Exception as e:
+        # Manejo de errores
+        print(f"Error en /admin-dashboard: {e}")
+        return jsonify({"msg": "Error processing request", "error": str(e)}), 500
+
+
+@api.route("/admin-users", methods=["GET"])
 @jwt_required()
 def get_users():
-    # Obtener el rol del usuario desde el token JWT
-    role = get_jwt()
-    user_role = role.get("role")
-
-    # Verificar si el usuario tiene permiso de administrador
-    if user_role != user_role.ADMIN.value:  
-        return jsonify({"msg": "Access denied: Admins only"}), 403
-
-    # Obtener todos los usuarios de la base de datos
     try:
+
+        identity = get_jwt_identity()  
+        claims = get_jwt() 
+
+        #user = db.session.execute(db.select(User).filter_by(email=identity)).scalar_one()
+
+        user_role = claims.get("role")
+        if user_role != "Admin":
+            return jsonify({"msg": "Access denied: Admins only"}), 403
+
         users = db.session.scalars(db.select(User)).all()
-        # Utilizar el método serialize() para estructurar los datos
         result = [user.serialize() for user in users]
-        print(result)
 
         return jsonify({"results": result}), 200
+
     except Exception as e:
-        return jsonify({"msg": f"Error processing token: {str(e)}"}), 422
+        print(f"Error en /admin-users: {e}")
+        return jsonify({"msg": f"Error processing request: {str(e)}"}), 500
+
 
 @api.route("/admin/users/<int:user_id>", methods=["DELETE"])
 @jwt_required()
-def delete_user_admin(id):
-    # Obtener el rol del usuario desde el token
-    role = get_jwt()
-    user_role = role.get("role")
+def delete_user_admin(user_id):
 
-    if user_role != "Admin":
-        return jsonify({"msg": "Access denied: Admins only"}), 403
+    try:
 
-    # Buscar al usuario en la base de datos
-    user = User.query.get(id)
-    if not user:
-        return jsonify({"msg": "User not found"}), 404
+        claims = get_jwt()
+        user_role = claims.get("role")
 
-    # Eliminar al usuario
-    db.session.delete(user)
-    db.session.commit()
+        if user_role != "Admin":
+            return jsonify({"msg": "Access denied: Admins only"}), 403
 
-    return jsonify({"msg": f"User with id {id} has been deleted"}), 200
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"msg": "User not found"}), 404
+
+        db.session.delete(user)
+        db.session.commit()
+
+        return jsonify({"msg": f"User with id {user_id} has been deleted"}), 200
+    except Exception as e:
+        print(f"Error deleting user: {e}")
+        return jsonify({"msg": f"Error processing request: {str(e)}"}), 500
+
+
 @api.route('/projects', methods=['POST'])
 @jwt_required()
 def create_project():

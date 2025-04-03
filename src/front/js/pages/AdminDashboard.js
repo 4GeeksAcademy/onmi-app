@@ -8,15 +8,17 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            await actions.getUsers();
+            const users = await actions.getUsers();
             setLoading(false);
+            if (users.length === 0) {
+                console.error("No users found or access denied.");
+            }
         };
         fetchData();
     }, [actions]);
 
     const handleDelete = async (userId) => {
-        const Id = userId
-        const success = await actions.deleteUser(Id);
+        const success = await actions.deleteUser(userId);
         if (success) {
             alert("User deleted successfully!");
         } else {
@@ -29,7 +31,7 @@ const AdminDashboard = () => {
             <h1>Admin Dashboard</h1>
             {loading ? (
                 <p>Loading users...</p>
-            ) : (
+            ) : store.users.length > 0 ? (
                 <table className="table">
                     <thead>
                         <tr>
@@ -54,6 +56,8 @@ const AdminDashboard = () => {
                         ))}
                     </tbody>
                 </table>
+            ) : (
+                <p>No users found.</p>
             )}
         </div>
     );

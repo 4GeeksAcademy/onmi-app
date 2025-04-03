@@ -6,11 +6,11 @@ import { CardHabit } from "../component/newHabit";
 
 export const Habits = () => {
 
-    return(
-        
-        <div class="container h-100">
-  <button type="button" onClick={CardHabit} class="btn btn-secondary">New Habit</button>
-</div>
-        
+    return (
+
+        <div className="container h-100">
+            <button type="button" onClick={CardHabit} className="btn btn-secondary">New Habit</button>
+        </div>
+
     )
 }
